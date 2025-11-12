@@ -474,10 +474,11 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
   import {
     getFirestore, collection, doc, getDoc, updateDoc,
-    onSnapshot, orderBy, query, serverTimestamp
+    onSnapshot, query, serverTimestamp
   } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 
+  // PAKAI CONFIG PROYEKMU (sama seperti index.html)
   const config = {
     apiKey: "AIzaSyDL0SlYn5sTMfs_r68-lYIAcd9C7todxdI",
     authDomain: "kantin-c5053.firebaseapp.com",
@@ -487,13 +488,19 @@
     appId: "1:838998866961:web:8ca40fc9cf359ec9a045b0"
   };
 
-  const app = initializeApp(config);
-  const db  = getFirestore(app);
+  const app  = initializeApp(config);
+  const db   = getFirestore(app);
   const auth = getAuth(app);
 
-  // <<<— LOGIN ANONIM UNTUK STAFF PAGE
-  try { await signInAnonymously(auth); } catch(e){ console.error('anon sign-in failed:', e); }
+  // 1) LOGIN ANONIM (WAJIB)
+  try {
+    await signInAnonymously(auth);
+    console.log('STAFF UID:', auth.currentUser?.uid);
+  } catch (e) {
+    console.error('anon sign-in failed:', e);
+  }
 
+  // helper: map dokumen Firestore -> format renderOrders() kamu
   function mapOrderDoc(d) {
     const o = d.data() || {};
     const created = o.createdAt?.toDate ? o.createdAt.toDate() : new Date();
@@ -510,9 +517,9 @@
     };
   }
 
-  // Listener realtime
+  // 2) REALTIME LISTENER (sementara TANPA orderBy biar aman)
   try {
-    const q = query(collection(db, 'orders'), orderBy('createdAt','desc'));
+    const q = query(collection(db, 'orders')); // nanti boleh diganti pakai orderBy('createdAt','desc')
     onSnapshot(q, (snap)=>{
       const orders = snap.docs.map(mapOrderDoc);
       window.renderOrders?.(orders);
@@ -522,19 +529,22 @@
       console.error(err);
       window.updateConnectionStatus?.(false);
     });
-  } catch(e){
+  } catch (e) {
     console.error(e);
     window.updateConnectionStatus?.(false);
   }
 
-  // Update status siklus
+  // 3) TOMBOL UPDATE STATUS
   window.updateOrderStatus = async function(orderId){
     try {
       const ref  = doc(db,'orders',orderId);
       const s    = await getDoc(ref);
       if (!s.exists()) { alert('Pesanan tidak ditemukan'); return; }
       const cur  = s.data().status || 'pending';
-      const next = cur==='pending'?'processing':cur==='processing'?'ready':cur==='ready'?'completed':'completed';
+      const next = cur==='pending' ? 'processing'
+                 : cur==='processing' ? 'ready'
+                 : cur==='ready' ? 'completed'
+                 : 'completed';
       await updateDoc(ref, { status: next, statusUpdatedAt: serverTimestamp() });
       window.showToast?.(`Status ${orderId} → ${next}`,'success');
     } catch(e){
@@ -543,6 +553,7 @@
     }
   };
 </script>
+
 
 
   <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99d6a50ec106a8d5',t:'MTc2Mjk1Njk2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
