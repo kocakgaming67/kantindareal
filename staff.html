@@ -471,75 +471,79 @@
 
   <!-- === Firebase REAL hookup (added) === -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-    import {
-      getFirestore, collection, doc, getDoc, updateDoc,
-      onSnapshot, orderBy, query, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+  import {
+    getFirestore, collection, doc, getDoc, updateDoc,
+    onSnapshot, orderBy, query, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 
-    // pakai config yang sama dengan index.html (PROYEKMU)
-    const config = {
-      apiKey: "AIzaSyDL0SlYn5sTMfs_r68-lYIAcd9C7todxdI",
-      authDomain: "kantin-c5053.firebaseapp.com",
-      projectId: "kantin-c5053",
-      storageBucket: "kantin-c5053.firebasestorage.app",
-      messagingSenderId: "838998866961",
-      appId: "1:838998866961:web:8ca40fc9cf359ec9a045b0"
+  const config = {
+    apiKey: "AIzaSyDL0SlYn5sTMfs_r68-lYIAcd9C7todxdI",
+    authDomain: "kantin-c5053.firebaseapp.com",
+    projectId: "kantin-c5053",
+    storageBucket: "kantin-c5053.firebasestorage.app",
+    messagingSenderId: "838998866961",
+    appId: "1:838998866961:web:8ca40fc9cf359ec9a045b0"
+  };
+
+  const app = initializeApp(config);
+  const db  = getFirestore(app);
+  const auth = getAuth(app);
+
+  // <<<— LOGIN ANONIM UNTUK STAFF PAGE
+  try { await signInAnonymously(auth); } catch(e){ console.error('anon sign-in failed:', e); }
+
+  function mapOrderDoc(d) {
+    const o = d.data() || {};
+    const created = o.createdAt?.toDate ? o.createdAt.toDate() : new Date();
+    return {
+      orderId: d.id,
+      timestamp: created,
+      studentName:  o.customerName || '-',
+      studentClass: o.customerClass || '-',
+      items: Array.isArray(o.items) ? o.items.map(it => ({
+        name: it.name, quantity: it.quantity, price: it.price, variant: it.variant || null
+      })) : [],
+      totalPrice: Number(o.total) || 0,
+      status: o.status || 'pending'
     };
+  }
 
-    const app = initializeApp(config);
-    const db  = getFirestore(app);
+  // Listener realtime
+  try {
+    const q = query(collection(db, 'orders'), orderBy('createdAt','desc'));
+    onSnapshot(q, (snap)=>{
+      const orders = snap.docs.map(mapOrderDoc);
+      window.renderOrders?.(orders);
+      window.updateStats?.(orders);
+      window.updateConnectionStatus?.(true);
+    }, (err)=>{
+      console.error(err);
+      window.updateConnectionStatus?.(false);
+    });
+  } catch(e){
+    console.error(e);
+    window.updateConnectionStatus?.(false);
+  }
 
-    // helper: map dokumen Firestore -> format renderOrders()
-    function mapOrderDoc(d) {
-      const o = d.data() || {};
-      const created = o.createdAt?.toDate ? o.createdAt.toDate() : new Date();
-      return {
-        orderId: d.id,
-        timestamp: created,
-        studentName:  o.customerName || '-',
-        studentClass: o.customerClass || '-',
-        items: Array.isArray(o.items) ? o.items.map(it => ({
-          name: it.name, quantity: it.quantity, price: it.price, variant: it.variant || null
-        })) : [],
-        totalPrice: Number(o.total) || 0,
-        status: o.status || 'pending'
-      };
-    }
-
-    // real-time feed
+  // Update status siklus
+  window.updateOrderStatus = async function(orderId){
     try {
-      const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
-      onSnapshot(q, (snap) => {
-        const orders = snap.docs.map(mapOrderDoc);
-        if (window.renderOrders) window.renderOrders(orders);
-        if (window.updateStats)  window.updateStats(orders);
-        if (window.updateConnectionStatus) window.updateConnectionStatus(true);
-      }, (err) => {
-        console.error(err);
-        if (window.updateConnectionStatus) window.updateConnectionStatus(false);
-      });
-    } catch (e) {
+      const ref  = doc(db,'orders',orderId);
+      const s    = await getDoc(ref);
+      if (!s.exists()) { alert('Pesanan tidak ditemukan'); return; }
+      const cur  = s.data().status || 'pending';
+      const next = cur==='pending'?'processing':cur==='processing'?'ready':cur==='ready'?'completed':'completed';
+      await updateDoc(ref, { status: next, statusUpdatedAt: serverTimestamp() });
+      window.showToast?.(`Status ${orderId} → ${next}`,'success');
+    } catch(e){
       console.error(e);
-      if (window.updateConnectionStatus) window.updateConnectionStatus(false);
+      alert('Gagal update status: '+e.message);
     }
+  };
+</script>
 
-    // override tombol Update Status → siklus pending→processing→ready→completed
-    window.updateOrderStatus = async function(orderId){
-      try {
-        const ref  = doc(db, 'orders', orderId);
-        const snap = await getDoc(ref);
-        if (!snap.exists()) { alert('Pesanan tidak ditemukan'); return; }
-        const cur = snap.data().status || 'pending';
-        const next = cur === 'pending' ? 'processing' : cur === 'processing' ? 'ready' : cur === 'ready' ? 'completed' : 'completed';
-        await updateDoc(ref, { status: next, statusUpdatedAt: serverTimestamp() });
-        if (window.showToast) window.showToast(`Status ${orderId} → ${next}`, 'success');
-      } catch (e) {
-        console.error(e);
-        alert('Gagal update status: ' + e.message);
-      }
-    };
-  </script>
 
   <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99d6a50ec106a8d5',t:'MTc2Mjk1Njk2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
  </body>
