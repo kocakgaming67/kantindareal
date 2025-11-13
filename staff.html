@@ -45,101 +45,180 @@
 <body class="bg-gradient-to-br from-slate-50 to-slate-200 min-h-screen">
 
   <!-- HEADER -->
- <!-- HEADER -->
-<header class="relative overflow-hidden bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-4 px-6 shadow-lg">
-  <!-- bulat-bulat animasi -->
-  <div class="pointer-events-none absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 animated-circle-1"></div>
-  <div class="pointer-events-none absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full -ml-16 -mb-16 animated-circle-2"></div>
+  <header class="relative overflow-hidden bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-4 px-6 shadow-lg">
+    <!-- bulat-bulat animasi -->
+    <div class="pointer-events-none absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 animated-circle-1"></div>
+    <div class="pointer-events-none absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full -ml-16 -mb-16 animated-circle-2"></div>
 
-  <!-- konten header -->
-  <div class="relative max-w-6xl mx-auto flex justify-between items-center">
-    <div class="flex items-center gap-3">
-      <!-- logo kecil di kiri (pakai logo.png yang sama dengan index.html) -->
-      <img src="logo.png"
-           alt="Logo Kantin"
-           class="w-10 h-10 object-contain"
-           onerror="this.style.display='none'">
-      <h1 class="text-2xl font-bold">Dashboard Staff</h1>
-    </div>
-    <div class="flex items-center gap-3 text-sm">
-      <span id="connectionStatus" class="px-3 py-1 rounded-full bg-black/20">Menyambung...</span>
-    </div>
-  </div>
-</header>
-
-
-
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-    <!-- FILTER STATUS -->
-    <div class="bg-white rounded-2xl shadow-md p-4 mb-6 flex flex-wrap gap-2 items-center">
-      <span class="text-sm font-semibold text-gray-700 mr-2">Status:</span>
-      <button class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-slate-800 text-white"
-              data-status="all">Semua</button>
-      <button class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800"
-        data-status="pending">Dalam Antrian</button>
-      <button class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800"
-              data-status="processing">Diproses</button>
-      <button class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-purple-100 text-purple-800"
-              data-status="ready">Siap Diambil</button>
-      <button class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800"
-              data-status="completed">Selesai</button>
-      <button class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-red-100 text-red-800"
-              data-status="cancelled">Dibatalkan</button>
-    </div>
-
-    <!-- RINGKASAN -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-      <div class="bg-white rounded-2xl shadow-md p-4">
-        <p class="text-xs text-gray-500">Total Order</p>
-        <p class="text-2xl font-bold text-gray-800" id="sum-total">0</p>
-      </div>
-      <div class="bg-white rounded-2xl shadow-md p-4">
-        <p class="text-xs text-gray-500">Pending</p>
-        <p class="text-2xl font-bold text-yellow-500" id="sum-pending">0</p>
-      </div>
-      <div class="bg-white rounded-2xl shadow-md p-4">
-        <p class="text-xs text-gray-500">Diproses</p>
-        <p class="text-2xl font-bold text-blue-500" id="sum-processing">0</p>
-      </div>
-      <div class="bg-white rounded-2xl shadow-md p-4">
-        <p class="text-xs text-gray-500">Siap Diambil</p>
-        <p class="text-2xl font-bold text-purple-500" id="sum-ready">0</p>
-      </div>
-    </div>
-
-    <!-- LIST ORDER -->
-    <div id="ordersContainer" class="space-y-4">
-      <!-- kartu order akan di-render lewat JS -->
-    </div>
-
-    <div id="emptyState" class="hidden mt-10 text-center text-gray-500">
-      Belum ada order.
-    </div>
-          <!-- ========== KELOLA MENU (ON / OFF & VARIAN) ========== -->
-      <section class="mt-10">
-        <h2 class="text-xl font-bold text-gray-800 mb-1">Kelola Ketersediaan Menu</h2>
-        <p class="text-sm text-gray-500 mb-4">
-          Centang untuk <span class="font-semibold">mematikan menu</span> atau varian tertentu jika stok habis.
-        </p>
-
-        <div id="menuStatusList" class="bg-white rounded-2xl shadow-lg p-4 divide-y divide-gray-100">
-          <!-- daftar menu akan dirender dari JavaScript -->
+    <!-- konten header -->
+    <div class="relative max-w-6xl mx-auto flex justify-between items-center">
+      <!-- Kiri: logo + judul -->
+      <div class="flex items-center gap-3">
+        <img src="logo.png"
+             alt="Logo Kantin"
+             class="w-10 h-10 object-contain"
+             onerror="this.style.display='none'">
+        <div>
+          <h1 class="text-xl md:text-2xl font-bold">Dashboard Staff</h1>
+          <p class="text-xs md:text-sm text-white/80">Kelola pesanan & menu kantin</p>
         </div>
+      </div>
+
+      <!-- Kanan: tab + status + hamburger -->
+      <div class="flex items-center gap-3">
+        <!-- NAV DESKTOP -->
+        <nav class="hidden md:flex items-center gap-2">
+          <button
+            data-section-btn="orders"
+            class="px-4 py-2 rounded-full text-xs md:text-sm font-semibold bg-white text-orange-600 shadow-sm"
+            onclick="showSection('orders')">
+            Orderan
+          </button>
+          <button
+            data-section-btn="menu"
+            class="px-4 py-2 rounded-full text-xs md:text-sm font-semibold bg-orange-400/40 hover:bg-orange-400/60 transition"
+            onclick="showSection('menu')">
+            Daftar Menu
+          </button>
+        </nav>
+
+        <!-- Badge koneksi (desktop) -->
+        <span id="connectionStatus"
+              class="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/20 text-xs">
+          Menyambung...
+        </span>
+
+        <!-- HAMBURGER MOBILE -->
+        <div class="md:hidden relative">
+          <button id="hamburgerBtn" class="p-2 rounded-md bg-white/20 hover:bg-white/30">
+            ☰
+          </button>
+          <div id="mobileMenu"
+               class="hidden absolute right-0 mt-2 w-44 bg-white text-gray-800 rounded-xl shadow-lg overflow-hidden z-50">
+            <button
+              data-section-btn="orders"
+              class="block w-full text-left px-4 py-2 text-sm hover:bg-orange-50"
+              onclick="showSection('orders'); toggleMobileMenu(false);">
+              Orderan
+            </button>
+            <button
+              data-section-btn="menu"
+              class="block w-full text-left px-4 py-2 text-sm hover:bg-orange-50"
+              onclick="showSection('menu'); toggleMobileMenu(false);">
+              Daftar Menu
+            </button>
+            <div class="border-t text-xs px-4 py-2 text-gray-500 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-green-400"></span>
+              <span id="connectionStatusMobile">Online</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </header>
+
+
+
+  <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+
+    <!-- ============= SECTION: ORDERAN ============= -->
+    <section id="ordersSection" class="space-y-6">
+      <!-- Filter Status -->
+      <div class="bg-white rounded-2xl shadow p-4 flex flex-wrap gap-3 items-center">
+        <span class="font-semibold text-gray-700 mr-2">Status:</span>
+        <div class="flex flex-wrap gap-2">
+          <button
+            class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-orange-500 text-white"
+            data-status="all">
+            Semua
+          </button>
+          <button
+            class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-700"
+            data-status="pending">
+            Dalam Antrian
+          </button>
+          <button
+            class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-700"
+            data-status="processing">
+            Diproses
+          </button>
+          <button
+            class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-700"
+            data-status="ready">
+            Siap Diambil
+          </button>
+          <button
+            class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-700"
+            data-status="completed">
+            Selesai
+          </button>
+          <button
+            class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-700"
+            data-status="cancelled">
+            Dibatalkan
+          </button>
+        </div>
+      </div>
+
+      <!-- Ringkasan jumlah -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl shadow p-4">
+          <p class="text-sm text-gray-500">Total Order</p>
+          <p id="sumTotal" class="text-2xl font-bold text-gray-800">0</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow p-4">
+          <p class="text-sm text-gray-500">Pending</p>
+          <p id="sumPending" class="text-2xl font-bold text-amber-500">0</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow p-4">
+          <p class="text-sm text-gray-500">Diproses</p>
+          <p id="sumProcessing" class="text-2xl font-bold text-blue-500">0</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow p-4">
+          <p class="text-sm text-gray-500">Siap Diambil</p>
+          <p id="sumReady" class="text-2xl font-bold text-green-500">0</p>
+        </div>
+      </div>
+
+      <!-- Daftar Order -->
+      <div id="ordersContainer" class="space-y-4"></div>
+
+      <!-- Empty state -->
+      <div id="emptyState" class="hidden mt-10 text-center text-gray-500">
+        Belum ada order.
+      </div>
+    </section>
+
+    <!-- ============= SECTION: DAFTAR MENU ============= -->
+    <section id="menuSection" class="hidden space-y-4">
+      <section class="bg-white rounded-2xl shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-1">Kelola Ketersediaan Menu</h2>
+        <p class="text-sm text-gray-500 mb-3">
+          Centang untuk <span class="font-semibold">mematikan</span> menu atau varian tertentu jika stok habis.
+        </p>
+        <form id="menuStatusForm" class="mt-4 space-y-4">
+          <div id="menuStatusList" class="divide-y divide-gray-100">
+            <!-- daftar menu + checkbox diisi lewat JS -->
+          </div>
+        </form>
       </section>
+    </section>
 
   </main>
+
 
   <!-- ================= FIREBASE & LOGIC STAFF ================= -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
     import {
-  getDatabase,
-  ref,
-  onValue,
-  get,
-  update,
-  set
-} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
+      getDatabase,
+      ref,
+      onValue,
+      get,
+      update,
+      set
+    } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
 
 
     // CONFIG SAMA DENGAN index.html
@@ -158,84 +237,84 @@
 
     console.log("✅ Terhubung ke Firebase kantin-sekolah-e6aea");
 
-// ================== DATA MASTER MENU (UNTUK PANEL STAFF) ==================
-const menuMaster = [
-  { id: 1,  name: "Bakwan" },
-  { id: 2,  name: "Dayaki" },
-  { id: 3,  name: "Pop Mie" },
-  { id: 4,  name: "Klepon" },
-  { id: 5,  name: "Nabati" },
-  { id: 6,  name: "Wafello" },
-  { id: 7,  name: "Pia Bali" },
-  { id: 8,  name: "Lemonilo" },
-  { id: 9,  name: "Better" },
-  { id: 10, name: "Malkis" },
-  { id: 11, name: "Gery Salut" },
-  { id: 12, name: "Tic Tac" },
+    // ================== DATA MASTER MENU (UNTUK PANEL STAFF) ==================
+    const menuMaster = [
+      { id: 1,  name: "Bakwan" },
+      { id: 2,  name: "Dayaki" },
+      { id: 3,  name: "Pop Mie" },
+      { id: 4,  name: "Klepon" },
+      { id: 5,  name: "Nabati" },
+      { id: 6,  name: "Wafello" },
+      { id: 7,  name: "Pia Bali" },
+      { id: 8,  name: "Lemonilo" },
+      { id: 9,  name: "Better" },
+      { id: 10, name: "Malkis" },
+      { id: 11, name: "Gery Salut" },
+      { id: 12, name: "Tic Tac" },
 
-  {
-    id: 13,
-    name: "Roti Beta",
-    hasVariants: true,
-    variants: ["Original", "Moka", "Cream", "Kompiang", "Kacang Hijau"]
-  },
+      {
+        id: 13,
+        name: "Roti Beta",
+        hasVariants: true,
+        variants: ["Original", "Moka", "Cream", "Kompiang", "Kacang Hijau"]
+      },
 
-  {
-    id: 14,
-    name: "Kacang Garuda",
-    hasVariants: true,
-    variants: ["Original", "Atom"]
-  },
+      {
+        id: 14,
+        name: "Kacang Garuda",
+        hasVariants: true,
+        variants: ["Original", "Atom"]
+      },
 
-  {
-    id: 15,
-    name: "Permen",
-    hasVariants: true,
-    variants: [
-      "Permen Kaki",
-      "Permen Mexico",
-      "Permen Kopiko",
-      "Permen Karet",
-      "Pendekar Biru",
-      "Permen Mentos"
-    ]
-  },
+      {
+        id: 15,
+        name: "Permen",
+        hasVariants: true,
+        variants: [
+          "Permen Kaki",
+          "Permen Mexico",
+          "Permen Kopiko",
+          "Permen Karet",
+          "Pendekar Biru",
+          "Permen Mentos"
+        ]
+      },
 
-  { id: 16, name: "Donat" },
-  { id: 17, name: "Pukis" },
+      { id: 16, name: "Donat" },
+      { id: 17, name: "Pukis" },
 
-  { id: 18, name: "Golda Coffee" },
-  { id: 19, name: "Floridina" },
-  { id: 20, name: "Milku" },
-  { id: 21, name: "Vita Jelly" },
-  { id: 22, name: "Ale Ale" },
-  { id: 23, name: "Teh Pucuk" },
-  { id: 24, name: "Teh Rio" },
-  { id: 25, name: "Air Putih" }
-];
+      { id: 18, name: "Golda Coffee" },
+      { id: 19, name: "Floridina" },
+      { id: 20, name: "Milku" },
+      { id: 21, name: "Vita Jelly" },
+      { id: 22, name: "Ale Ale" },
+      { id: 23, name: "Teh Pucuk" },
+      { id: 24, name: "Teh Rio" },
+      { id: 25, name: "Air Putih" }
+    ];
 
-// ============ LISTENER menuStatus KHUSUS STAFF + RENDER PANEL ============
-const menuStatusRef = ref(db, "menuStatus");
-window.menuStatus = window.menuStatus || {}; // global yang sama dipakai index.html
+    // ============ LISTENER menuStatus KHUSUS STAFF + RENDER PANEL ============
+    const menuStatusRef = ref(db, "menuStatus");
+    window.menuStatus = window.menuStatus || {}; // global yang sama dipakai index.html
 
-onValue(menuStatusRef, (snapshot) => {
-  window.menuStatus = snapshot.val() || {};
-  renderMenuStatusPanel();
-});
+    onValue(menuStatusRef, (snapshot) => {
+      window.menuStatus = snapshot.val() || {};
+      renderMenuStatusPanel();
+    });
 
-// ============ RENDER PANEL KELOLA MENU ============
-function renderMenuStatusPanel() {
-  const container = document.getElementById("menuStatusList");
-  if (!container) return;
+    // ============ RENDER PANEL KELOLA MENU ============
+    function renderMenuStatusPanel() {
+      const container = document.getElementById("menuStatusList");
+      if (!container) return;
 
-  const statusMap = window.menuStatus || {};
+      const statusMap = window.menuStatus || {};
 
-  container.innerHTML = menuMaster.map((item) => {
-    const status = statusMap[item.id] || {};
-    const disabled = status.disabled === true;
-    const disabledVariants = status.disabledVariants || {};
+      container.innerHTML = menuMaster.map((item) => {
+        const status = statusMap[item.id] || {};
+        const disabled = status.disabled === true;
+        const disabledVariants = status.disabledVariants || {};
 
-    return `
+        return `
       <div class="py-3 border-b border-gray-100 last:border-b-0">
         <div class="flex items-start justify-between gap-4">
           <div>
@@ -286,30 +365,31 @@ function renderMenuStatusPanel() {
         }
       </div>
     `;
-  }).join("");
-}
+      }).join("");
+    }
 
 
     const ordersRef        = ref(db, "orders");
     const container        = document.getElementById("ordersContainer");
     const emptyState       = document.getElementById("emptyState");
     const connectionStatus = document.getElementById("connectionStatus");
+    const connectionStatusMobile = document.getElementById("connectionStatusMobile");
 
-    const sumTotalEl      = document.getElementById("sum-total");
-    const sumPendingEl    = document.getElementById("sum-pending");
-    const sumProcessingEl = document.getElementById("sum-processing");
-    const sumReadyEl      = document.getElementById("sum-ready");
+    const sumTotalEl      = document.getElementById("sumTotal");
+    const sumPendingEl    = document.getElementById("sumPending");
+    const sumProcessingEl = document.getElementById("sumProcessing");
+    const sumReadyEl      = document.getElementById("sumReady");
 
     // filter status yang sedang aktif di UI
-let currentFilter   = "all";      // ✅ default: tampilkan SEMUA order
-let latestEntries   = [];         // ✅ simpan data snapshot terakhir
+    let currentFilter   = "all";      // ✅ default: tampilkan SEMUA order
+    let latestEntries   = [];         // ✅ simpan data snapshot terakhir
 
-// tandai filter tombol awal (Semua)
-document.querySelectorAll(".status-filter").forEach(btn => {
-  if (btn.dataset.status === currentFilter) {
-    btn.classList.add("ring-2", "ring-offset-1", "ring-orange-400");
-  }
-});
+    // tandai filter tombol awal (Semua)
+    document.querySelectorAll(".status-filter").forEach(btn => {
+      if (btn.dataset.status === currentFilter) {
+        btn.classList.add("ring-2", "ring-offset-1", "ring-orange-400");
+      }
+    });
 
 
     const STATUS_LABEL = {
@@ -334,38 +414,48 @@ document.querySelectorAll(".status-filter").forEach(btn => {
 
     // ============ LISTENER REALTIME ============
 
-onValue(ordersRef, (snapshot) => {
-  const data = snapshot.val() || {};
+    onValue(ordersRef, (snapshot) => {
+      const data = snapshot.val() || {};
 
-  connectionStatus.textContent = "Online";
-  connectionStatus.className =
-    "px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold";
+      connectionStatus.textContent = "Online";
+      connectionStatus.className =
+        "hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold";
 
-  const entries = Object.entries(data).map(([id, order]) => ({
-    id,
-    ...order
-  }));
+      if (connectionStatusMobile) {
+        connectionStatusMobile.textContent = "Online";
+      }
 
-  // sort by createdAt terbaru
-  entries.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      const entries = Object.entries(data).map(([id, order]) => ({
+        id,
+        ...order
+      }));
 
-  // ✅ simpan snapshot terakhir ke variabel global
-  latestEntries = entries;
+      // sort by createdAt terbaru
+      entries.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
-  // render ringkasan & daftar berdasarkan filter aktif
-  renderSummary(latestEntries);
-  renderOrders(latestEntries);
-}, (error) => {
-  console.error(error);
-  connectionStatus.textContent = "Gagal terhubung";
-  connectionStatus.className =
-    "px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold";
-});
+      // ✅ simpan snapshot terakhir ke variabel global
+      latestEntries = entries;
+
+      // render ringkasan & daftar berdasarkan filter aktif
+      renderSummary(latestEntries);
+      renderOrders(latestEntries);
+    }, (error) => {
+      console.error(error);
+      connectionStatus.textContent = "Gagal terhubung";
+      connectionStatus.className =
+        "hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold";
+
+      if (connectionStatusMobile) {
+        connectionStatusMobile.textContent = "Offline";
+      }
+    });
 
 
     // ============ RENDER SUMMARY ============
 
     function renderSummary(entries) {
+      if (!sumTotalEl) return;
+
       sumTotalEl.textContent = entries.length;
 
       const counts = { pending: 0, processing: 0, ready: 0, completed: 0, cancelled: 0 };
@@ -373,9 +463,9 @@ onValue(ordersRef, (snapshot) => {
         if (counts[o.status] !== undefined) counts[o.status]++;
       });
 
-      sumPendingEl.textContent    = counts.pending;
-      sumProcessingEl.textContent = counts.processing;
-      sumReadyEl.textContent      = counts.ready;
+      if (sumPendingEl)    sumPendingEl.textContent    = counts.pending;
+      if (sumProcessingEl) sumProcessingEl.textContent = counts.processing;
+      if (sumReadyEl)      sumReadyEl.textContent      = counts.ready;
     }
 
     // ============ RENDER ORDERS ============
@@ -521,77 +611,153 @@ onValue(ordersRef, (snapshot) => {
     // ============ FILTER STATUS BUTTONS ============
 
     document.querySelectorAll(".status-filter").forEach(btn => {
-  btn.addEventListener("click", () => {
-    currentFilter = btn.dataset.status;
+      btn.addEventListener("click", () => {
+        currentFilter = btn.dataset.status;
 
-    document.querySelectorAll(".status-filter").forEach(b => {
-      b.classList.remove("ring-2", "ring-offset-1", "ring-orange-400");
+        document.querySelectorAll(".status-filter").forEach(b => {
+          b.classList.remove("ring-2", "ring-offset-1", "ring-orange-400");
+        });
+        btn.classList.add("ring-2", "ring-offset-1", "ring-orange-400");
+
+        // ✅ langsung render ulang list pakai data terakhir
+        renderOrders(latestEntries);
+      });
     });
-    btn.classList.add("ring-2", "ring-offset-1", "ring-orange-400");
 
-    // ✅ langsung render ulang list pakai data terakhir
-    renderOrders(latestEntries);
-  });
-});
-// ============ HANDLER KETIKA CHECKBOX DI STAFF DIUBAH ============
-const menuStatusListEl = document.getElementById("menuStatusList");
+    // ============ HANDLER KETIKA CHECKBOX DI STAFF DIUBAH ============
+    const menuStatusListEl = document.getElementById("menuStatusList");
 
-if (menuStatusListEl) {
-  menuStatusListEl.addEventListener("change", async (event) => {
-    const target = event.target;
+    if (menuStatusListEl) {
+      menuStatusListEl.addEventListener("change", async (event) => {
+        const target = event.target;
 
-    // Matikan / nyalakan seluruh menu
-    if (target.matches("[data-menu-toggle]")) {
-      const menuId = Number(target.getAttribute("data-menu-toggle"));
-      const disabled = target.checked;
-      await updateWholeMenuStatus(menuId, { disabled });
+        // Matikan / nyalakan seluruh menu
+        if (target.matches("[data-menu-toggle]")) {
+          const menuId = Number(target.getAttribute("data-menu-toggle"));
+          const disabled = target.checked;
+          await updateWholeMenuStatus(menuId, { disabled });
+        }
+
+        // Matikan / nyalakan varian tertentu
+        if (target.matches("[data-variant-toggle]")) {
+          const menuId = Number(target.getAttribute("data-variant-toggle"));
+          const variantName = target.getAttribute("data-variant-name");
+          const disabled = target.checked;
+          await updateVariantStatus(menuId, variantName, disabled);
+        }
+      });
     }
 
-    // Matikan / nyalakan varian tertentu
-    if (target.matches("[data-variant-toggle]")) {
-      const menuId = Number(target.getAttribute("data-variant-toggle"));
-      const variantName = target.getAttribute("data-variant-name");
-      const disabled = target.checked;
-      await updateVariantStatus(menuId, variantName, disabled);
+    // ====== FUNGSI UPDATE KE FIREBASE ======
+    async function updateWholeMenuStatus(menuId, partial) {
+      const current = (window.menuStatus && window.menuStatus[menuId]) || {};
+      const newStatus = { ...current, ...partial };
+
+      const menuRef = ref(db, `menuStatus/${menuId}`);
+      try {
+        await set(menuRef, newStatus);
+      } catch (err) {
+        console.error("Gagal update menuStatus:", err);
+        alert("Gagal menyimpan status menu. Coba lagi ya.");
+      }
     }
-  });
-}
 
-// ====== FUNGSI UPDATE KE FIREBASE ======
-async function updateWholeMenuStatus(menuId, partial) {
-  const current = (window.menuStatus && window.menuStatus[menuId]) || {};
-  const newStatus = { ...current, ...partial };
+    async function updateVariantStatus(menuId, variantName, disabled) {
+      const current = (window.menuStatus && window.menuStatus[menuId]) || {};
+      const disabledVariants = { ...(current.disabledVariants || {}) };
 
-  const menuRef = ref(db, `menuStatus/${menuId}`);
-  try {
-    await set(menuRef, newStatus);
-  } catch (err) {
-    console.error("Gagal update menuStatus:", err);
-    alert("Gagal menyimpan status menu. Coba lagi ya.");
-  }
-}
+      if (disabled) {
+        disabledVariants[variantName] = true;
+      } else {
+        delete disabledVariants[variantName];
+      }
 
-async function updateVariantStatus(menuId, variantName, disabled) {
-  const current = (window.menuStatus && window.menuStatus[menuId]) || {};
-  const disabledVariants = { ...(current.disabledVariants || {}) };
+      const newStatus = { ...current, disabledVariants };
+      const menuRef = ref(db, `menuStatus/${menuId}`);
 
-  if (disabled) {
-    disabledVariants[variantName] = true;
-  } else {
-    delete disabledVariants[variantName];
-  }
+      try {
+        await set(menuRef, newStatus);
+      } catch (err) {
+        console.error("Gagal update varian menuStatus:", err);
+        alert("Gagal menyimpan status varian. Coba lagi ya.");
+      }
+    }
 
-  const newStatus = { ...current, disabledVariants };
-  const menuRef = ref(db, `menuStatus/${menuId}`);
+    // ========= SWITCH SECTION (ORDERS / MENU) =========
+    window.showSection = function showSection(section) {
+      const orders = document.getElementById("ordersSection");
+      const menu   = document.getElementById("menuSection");
+      if (!orders || !menu) return;
 
-  try {
-    await set(menuRef, newStatus);
-  } catch (err) {
-    console.error("Gagal update varian menuStatus:", err);
-    alert("Gagal menyimpan status varian. Coba lagi ya.");
-  }
-}
+      if (section === "menu") {
+        orders.classList.add("hidden");
+        menu.classList.remove("hidden");
+      } else {
+        section = "orders";
+        orders.classList.remove("hidden");
+        menu.classList.add("hidden");
+      }
 
+      // update style tombol (desktop + mobile)
+      document.querySelectorAll("[data-section-btn]").forEach(btn => {
+        const target   = btn.getAttribute("data-section-btn");
+        const isActive = target === section;
+
+        if (btn.closest("#mobileMenu")) {
+          // tombol di dropdown mobile
+          btn.classList.toggle("bg-orange-50", isActive);
+          btn.classList.toggle("font-semibold", isActive);
+        } else {
+          // tombol di navbar desktop
+          const baseClasses = "px-4 py-2 rounded-full text-xs md:text-sm font-semibold";
+          if (isActive) {
+            btn.className = baseClasses + " bg-white text-orange-600 shadow-sm";
+          } else {
+            btn.className = baseClasses + " bg-orange-400/40 hover:bg-orange-400/60 transition text-white";
+          }
+        }
+      });
+    };
+
+    // ========= HAMBURGER MOBILE =========
+    window.toggleMobileMenu = function toggleMobileMenu(force) {
+      const menu = document.getElementById("mobileMenu");
+      if (!menu) return;
+
+      const shouldShow =
+        typeof force === "boolean" ? force : menu.classList.contains("hidden");
+
+      if (shouldShow) {
+        menu.classList.remove("hidden");
+      } else {
+        menu.classList.add("hidden");
+      }
+    };
+
+    const hamburgerBtn = document.getElementById("hamburgerBtn");
+    if (hamburgerBtn) {
+      hamburgerBtn.addEventListener("click", () => {
+        toggleMobileMenu();
+      });
+    }
+
+    // klik di luar menu → tutup menu
+    document.addEventListener("click", (event) => {
+      const menu = document.getElementById("mobileMenu");
+      const btn  = document.getElementById("hamburgerBtn");
+      if (!menu || !btn) return;
+
+      if (
+        !menu.classList.contains("hidden") &&
+        !menu.contains(event.target) &&
+        !btn.contains(event.target)
+      ) {
+        menu.classList.add("hidden");
+      }
+    });
+
+    // default: buka section orders
+    showSection("orders");
   </script>
 </body>
 </html>

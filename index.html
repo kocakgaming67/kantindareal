@@ -185,16 +185,57 @@
             <!-- Customer Form -->
             <form id="checkoutForm" onsubmit="submitOrder(event)" class="space-y-4">
               <div>
-                <label for="customerName" class="block text-sm font-semibold text-gray-700 mb-2">Nama Lengkap</label>
-                <input type="text" id="customerName" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-all" placeholder="Masukkan nama kamu">
-              </div>
-              <div>
-                <label for="customerClass" class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
-                <input type="text" id="customerClass" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-all" placeholder="Contoh: 10 IPA 1">
-              </div>
+  <div>
+  <label for="customerClass" class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
+  <select
+    id="customerClass"
+    required
+    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-all bg-white"
+  >
+    <option value="" disabled selected>Pilih kelas kamu</option>
+
+    <optgroup label="Kelas 10">
+      <option value="10A">10A</option>
+      <option value="10B">10B</option>
+      <option value="10C">10C</option>
+      <option value="10D">10D</option>
+      <option value="10E">10E</option>
+      <option value="10F">10F</option>
+      <option value="10G">10G</option>
+      <option value="10H">10H</option>
+      <option value="10I">10I</option>
+    </optgroup>
+
+    <optgroup label="Kelas 11">
+      <option value="11A">11A</option>
+      <option value="11B">11B</option>
+      <option value="11C">11C</option>
+      <option value="11D">11D</option>
+      <option value="11E">11E</option>
+      <option value="11F">11F</option>
+      <option value="11G">11G</option>
+      <option value="11H">11H</option>
+      <option value="11I">11I</option>
+    </optgroup>
+
+    <optgroup label="Kelas 12">
+      <option value="12A">12A</option>
+      <option value="12B">12B</option>
+      <option value="12C">12C</option>
+      <option value="12D">12D</option>
+      <option value="12E">12E</option>
+      <option value="12F">12F</option>
+      <option value="12G">12G</option>
+      <option value="12H">12H</option>
+      <option value="12I">12I</option>
+    </optgroup>
+  </select>
+</div>
+
+
               <div>
                 <label for="customerNotes" class="block text-sm font-semibold text-gray-700 mb-2">Catatan (Opsional)</label>
-                <textarea id="customerNotes" rows="3" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-all" placeholder="Contoh: Pedas sedang, tanpa sayur, dll"></textarea>
+                <textarea id="customerNotes" rows="3" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-all" placeholder="Contoh: mie jangan diseduh"></textarea>
               </div>
               <div class="flex gap-3 pt-4">
                 <button type="button" onclick="closeCheckoutModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-300 transition-all">Batal</button>
@@ -700,14 +741,13 @@
 <script type="module">
   // Import Firebase v12 (modular, dari CDN)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
- import {
-  getDatabase,
-  ref,
-  push,
-  get,
-  onValue
-} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
-
+  import {
+    getDatabase,
+    ref,
+    push,
+    get,
+    onValue
+  } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
 
   // CONFIG PROJECT KAMU (kantin-sekolah-e6aea)
   const firebaseConfig = {
@@ -721,83 +761,82 @@
   };
 
   // Init Firebase
-const app = initializeApp(firebaseConfig);
-const db  = getDatabase(app);
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
 
-console.log("✅ Terhubung ke Firebase kantin-sekolah-e6aea");
+  console.log("✅ Terhubung ke Firebase kantin-sekolah-e6aea");
 
-// === LISTENER REALTIME UNTUK STATUS MENU (ON/OFF + VARIAN) ===
-const menuStatusRef = ref(db, "menuStatus");
+  // === LISTENER REALTIME UNTUK STATUS MENU (ON/OFF + VARIAN) ===
+  const menuStatusRef = ref(db, "menuStatus");
 
-onValue(menuStatusRef, (snapshot) => {
-  // simpan status ke global supaya bisa dipakai di renderMenu()
-  window.menuStatus = snapshot.val() || {};
-  if (typeof renderMenu === "function") {
-    renderMenu();
-  }
-});
-
-
+  onValue(menuStatusRef, (snapshot) => {
+    // simpan status ke global supaya bisa dipakai di renderMenu()
+    window.menuStatus = snapshot.val() || {};
+    if (typeof renderMenu === "function") {
+      renderMenu();
+    }
+  });
 
   // ======================================================
   //  SUBMIT ORDER  (dipanggil dari form: onsubmit="submitOrder(event)")
   // ======================================================
- window.submitOrder = async function submitOrder(event) {
-  event.preventDefault();
+  window.submitOrder = async function submitOrder(event) {
+    event.preventDefault();
 
-  const customerName  = document.getElementById('customerName').value.trim();
-  const customerClass = document.getElementById('customerClass').value.trim();
-  const customerNotes = document.getElementById('customerNotes').value.trim();
+    const customerClass = document.getElementById('customerClass').value;
+    const customerNotes = document.getElementById('customerNotes').value.trim();
 
-  if (!customerName || !customerClass) {
-    alert("Nama dan kelas wajib diisi.");
-    return;
-  }
+    // Sekarang cuma wajib pilih kelas
+    if (!customerClass) {
+      alert("Kelas wajib dipilih.");
+      return;
+    }
 
-  if (!Array.isArray(cart) || cart.length === 0) {
-    alert("Keranjang masih kosong.");
-    return;
-  }
+    if (!Array.isArray(cart) || cart.length === 0) {
+      alert("Keranjang masih kosong.");
+      return;
+    }
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-  const orderData = {
-    customerName,
-    customerClass,
-    notes: customerNotes || null,
-    items: cart.map(it => ({
-      id: it.id,
-      name: it.name,
-      variant: it.variant || null,
-      price: it.price,
-      quantity: it.quantity
-    })),
-    total,
-    status: "pending",
-    createdAt: Date.now()
-  };
-
-  try {
-    const ordersRef   = ref(db, "orders");
-    const newOrderRef = await push(ordersRef, orderData);
-    const orderId     = newOrderRef.key;
-
-    // ❗ Jangan ubah HTML modal lagi, cukup pakai alert + reset
-    alert(
-      "Pesanan berhasil dibuat!\n\n" +
-      "Nomor pesanan kamu:\n" + orderId + "\n\n" +
-      "Simpan nomor ini untuk cek status pesanan di menu 'Cek Pesanan'."
+    const total = cart.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
     );
 
-    // Bersihkan dan balik ke landing
-    finishOrder();
+    const orderData = {
+      customerName: null,      // nama dihapus dari form, jadi null saja
+      customerClass,
+      notes: customerNotes || null,
+      items: cart.map(it => ({
+        id: it.id,
+        name: it.name,
+        variant: it.variant || null,
+        price: it.price,
+        quantity: it.quantity
+      })),
+      total,
+      status: "pending",
+      createdAt: Date.now()
+    };
 
-  } catch (err) {
-    console.error("Gagal menyimpan pesanan:", err);
-    alert("Terjadi kesalahan saat menyimpan pesanan. Coba lagi ya.");
-  }
-};
+    try {
+      const ordersRef   = ref(db, "orders");
+      const newOrderRef = await push(ordersRef, orderData);
+      const orderId     = newOrderRef.key;
 
+      alert(
+        "Pesanan berhasil dibuat!\n\n" +
+        "Nomor pesanan kamu:\n" + orderId + "\n\n" +
+        "Simpan nomor ini untuk cek status pesanan di menu 'Cek Pesanan'."
+      );
+
+      // Reset & balik ke landing
+      finishOrder();
+
+    } catch (err) {
+      console.error("Gagal menyimpan pesanan:", err);
+      alert("Terjadi kesalahan saat menyimpan pesanan. Coba lagi ya.");
+    }
+  };
 
   // ======================================================
   //  CHECK ORDER  (dipanggil dari tombol: onclick="checkOrder()")
@@ -894,7 +933,7 @@ onValue(menuStatusRef, (snapshot) => {
   };
 
   // ======================================================
-  //  FINISH ORDER (dipanggil tombol "Selesai" di modal)
+  //  FINISH ORDER (dipanggil setelah pesanan sukses)
   // ======================================================
   window.finishOrder = function finishOrder() {
     cart = [];
