@@ -278,6 +278,37 @@
     </main>
   </div>
 <script>
+
+      // ===================== NAVIGASI HALAMAN =====================
+  function showLandingPage() {
+    document.getElementById('landingPage').classList.remove('hidden');
+    document.getElementById('orderPage').classList.add('hidden');
+    document.getElementById('checkPage').classList.add('hidden');
+  }
+
+  function showOrderPage() {
+    document.getElementById('landingPage').classList.add('hidden');
+    document.getElementById('orderPage').classList.remove('hidden');
+    document.getElementById('checkPage').classList.add('hidden');
+    // pastikan menu muncul saat buka halaman order
+    renderMenu();
+  }
+
+  function showCheckPage() {
+    document.getElementById('landingPage').classList.add('hidden');
+    document.getElementById('orderPage').classList.add('hidden');
+    document.getElementById('checkPage').classList.remove('hidden');
+
+    // reset tampilan cek pesanan
+    const resultBox   = document.getElementById('orderResult');
+    const notFoundBox = document.getElementById('orderNotFound');
+    const orderInput  = document.getElementById('orderIdInput');
+
+    if (resultBox)   resultBox.classList.add('hidden');
+    if (notFoundBox) notFoundBox.classList.add('hidden');
+    if (orderInput)  orderInput.value = '';
+  }
+
   // ===================== DATA MENU =====================
   const menuItems = [
     // Snack
@@ -355,100 +386,145 @@
     return 'Rp ' + amount.toLocaleString('id-ID');
   }
 
-  // ===================== HALAMAN NAVIGASI =====================
-  function showLandingPage() {
-    document.getElementById('landingPage').classList.remove('hidden');
-    document.getElementById('orderPage').classList.add('hidden');
-    document.getElementById('checkPage').classList.add('hidden');
-  }
-
-  function showOrderPage() {
-    document.getElementById('landingPage').classList.add('hidden');
-    document.getElementById('orderPage').classList.remove('hidden');
-    document.getElementById('checkPage').classList.add('hidden');
-    renderMenu();
-  }
-
-  function showCheckPage() {
-    document.getElementById('landingPage').classList.add('hidden');
-    document.getElementById('orderPage').classList.add('hidden');
-    document.getElementById('checkPage').classList.remove('hidden');
-    document.getElementById('orderResult').classList.add('hidden');
-    document.getElementById('orderNotFound').classList.add('hidden');
-    document.getElementById('orderIdInput').value = '';
-  }
-
-  // ===================== RENDER MENU =====================
+  // ===================== RENDER MENU (PAKAI STATUS FIREBASE) =====================
   function renderMenu() {
-    const menuGrid = document.getElementById('menuGrid');
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const menuGrid   = document.getElementById('menuGrid');
+    const searchTerm = (document.getElementById('searchInput')?.value || '').toLowerCase();
 
     let filteredItems = menuItems;
 
-    if (currentFilter !== 'Semua')
+    // filter kategori
+    if (currentFilter !== 'Semua') {
       filteredItems = filteredItems.filter(item => item.category === currentFilter);
+    }
 
-    if (searchTerm)
-      filteredItems = filteredItems.filter(item => item.name.toLowerCase().includes(searchTerm));
+    // filter search
+    if (searchTerm) {
+      filteredItems = filteredItems.filter(item =>
+        item.name.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    const statusMap = window.menuStatus || {};
 
     menuGrid.innerHTML = filteredItems.map(item => {
       const selectedVariant = selectedVariants[item.id];
-      const variantName = selectedVariant ? selectedVariant.name : (item.hasVariants ? item.variants[0].name : null);
+      const variantName = selectedVariant
+        ? selectedVariant.name
+        : (item.hasVariants ? item.variants[0].name : null);
+
       const cartItem = cart.find(
-  c => c.id === item.id && (c.variant || '') === (variantName || '')
-);
+        c => c.id === item.id && (c.variant || '') === (variantName || '')
+      );
       const quantity = cartItem ? cartItem.quantity : 0;
+
       const displayImage = selectedVariant ? selectedVariant.image : item.image;
       const displayPrice = selectedVariant ? selectedVariant.price : item.price;
 
+      // status dari Firebase
+      const status           = statusMap[item.id] || {};
+      const menuDisabled     = status.disabled === true;
+      const disabledVariants = status.disabledVariants || {};
+
+      // kalau di data awal soldOut = true ATAU menuDisabled = true → anggap habis
+      const isSoldOut = item.soldOut || menuDisabled;
+
+      // teks kecil di bawah harga
+      let statusText = '';
+      if (menuDisabled) {
+        statusText = '<p class="text-xs text-red-500 font-semibold mt-1">Menu sedang tidak tersedia</p>';
+      } else if (item.hasVariants && Object.values(disabledVariants).some(Boolean)) {
+        statusText = '<p class="text-xs text-amber-500 mt-1">Beberapa varian habis</p>';
+      }
+
       return `
-        <div class="menu-card bg-white rounded-2xl shadow-lg overflow-hidden ${item.soldOut ? 'opacity-60' : ''}">
+        <div class="menu-card bg-white rounded-2xl shadow-lg overflow-hidden ${isSoldOut ? 'opacity-60' : ''}">
           <div class="relative">
             <img id="menu-img-${item.id}" src="${displayImage}" alt="${item.name}" class="menu-image" onerror="this.src='fallback.jpg'">
-            ${item.soldOut ? '<div class="absolute inset-0 bg-black/50 flex items-center justify-center"><span class="bg-red-500 text-white px-4 py-2 rounded-lg font-bold">HABIS</span></div>' : ''}
+            ${isSoldOut
+              ? '<div class="absolute inset-0 bg-black/50 flex items-center justify-center"><span class="bg-red-500 text-white px-4 py-2 rounded-lg font-bold">TIDAK TERSEDIA</span></div>'
+              : ''
+            }
           </div>
           <div class="p-4">
             <h3 class="font-bold text-gray-800 text-lg mb-1">${item.name}</h3>
-            <p class="text-orange-600 font-bold text-xl mb-3" id="price-${item.id}">${formatCurrency(displayPrice)}</p>
+            <p class="text-orange-600 font-bold text-xl mb-1" id="price-${item.id}">${formatCurrency(displayPrice)}</p>
+            ${statusText}
 
             ${item.hasVariants ? `
-              <div class="relative mb-3">
-                <button id="variant-btn-${item.id}" onclick="toggleVariantPopup(${item.id})" class="w-full bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-200 transition-all" ${item.soldOut ? 'disabled' : ''}>
+              <div class="relative mt-3 mb-3">
+                <button
+                  id="variant-btn-${item.id}"
+                  onclick="toggleVariantPopup(${item.id})"
+                  class="w-full bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-200 transition-all"
+                  ${isSoldOut ? 'disabled' : ''}
+                >
                   Varian: ${variantName} ▼
                 </button>
                 <div id="variant-popup-${item.id}" class="variant-popup">
                   <div class="p-3">
                     <p class="font-semibold text-gray-800 mb-2 text-sm">Pilih Varian:</p>
-                    ${item.variants.map((variant, idx) => `
-                      <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-all">
-                        <input type="radio" name="variant-${item.id}" value="${idx}" ${(selectedVariant && selectedVariant.index === idx) || (!selectedVariant && idx === 0) ? 'checked' : ''} onchange="selectVariant(${item.id}, ${idx})" class="w-4 h-4 text-orange-500">
-                        <span class="flex-1 text-sm text-gray-700">${variant.name}</span>
-                        <span class="text-sm font-semibold text-orange-600">${formatCurrency(variant.price)}</span>
-                      </label>
-                    `).join('')}
+                    ${
+                      item.variants.map((variant, idx) => {
+                        const vDisabled = !!disabledVariants[variant.name];
+                        const isChecked =
+                          (selectedVariant && selectedVariant.index === idx) ||
+                          (!selectedVariant && idx === 0);
+                        return `
+                          <label class="flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all ${vDisabled ? 'opacity-50' : 'hover:bg-gray-50'}">
+                            <input
+                              type="radio"
+                              name="variant-${item.id}"
+                              value="${idx}"
+                              ${isChecked ? 'checked' : ''}
+                              ${vDisabled ? 'disabled' : ''}
+                              onchange="selectVariant(${item.id}, ${idx})"
+                              class="w-4 h-4 text-orange-500">
+                            <span class="flex-1 text-sm text-gray-700">
+                              ${variant.name}${vDisabled ? ' (Habis)' : ''}
+                            </span>
+                            <span class="text-sm font-semibold text-orange-600">
+                              ${formatCurrency(variant.price)}
+                            </span>
+                          </label>
+                        `;
+                      }).join('')
+                    }
                   </div>
                 </div>
               </div>
             ` : ''}
 
-            ${item.soldOut ? `
-              <button disabled class="w-full bg-gray-300 text-gray-500 py-2 rounded-lg font-semibold cursor-not-allowed">Stok Habis</button>
-            ` : quantity === 0 ? `
-              <button onclick="addToCart(${item.id})" class="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-2 rounded-lg font-semibold hover:from-orange-600 hover:to-yellow-600 transition-all shadow-md">
-                + Tambah
-              </button>
-            ` : `
-              <div class="flex items-center gap-2">
-                <button onclick="decreaseQuantity(${item.id}, '${variantName ?? ''}')" class="flex-1 bg-red-500 text-white py-2 rounded-lg font-bold hover:bg-red-600 transition-all">−</button>
-                <span class="flex-1 text-center font-bold text-lg text-gray-800">${quantity}</span>
-                <button onclick="increaseQuantity(${item.id}, '${variantName ?? ''}')" class="flex-1 bg-green-500 text-white py-2 rounded-lg font-bold hover:bg-green-600 transition-all">+</button>
-              </div>
-            `}
+            ${
+              isSoldOut
+                ? `
+                  <button disabled class="mt-1 w-full bg-gray-300 text-gray-500 py-2 rounded-lg font-semibold cursor-not-allowed">
+                    Tidak Tersedia
+                  </button>
+                `
+                : quantity === 0
+                  ? `
+                    <button onclick="addToCart(${item.id})"
+                      class="mt-1 w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-2 rounded-lg font-semibold hover:from-orange-600 hover:to-yellow-600 transition-all shadow-md">
+                      + Tambah
+                    </button>
+                  `
+                  : `
+                    <div class="mt-1 flex items-center gap-2">
+                      <button onclick="decreaseQuantity(${item.id}, '${variantName ?? ''}')"
+                        class="flex-1 bg-red-500 text-white py-2 rounded-lg font-bold hover:bg-red-600 transition-all">−</button>
+                      <span class="flex-1 text-center font-bold text-lg text-gray-800">${quantity}</span>
+                      <button onclick="increaseQuantity(${item.id}, '${variantName ?? ''}')"
+                        class="flex-1 bg-green-500 text-white py-2 rounded-lg font-bold hover:bg-green-600 transition-all">+</button>
+                    </div>
+                  `
+            }
           </div>
         </div>
       `;
     }).join('');
   }
+
 
   // ===================== VARIAN POPUP =====================
   function toggleVariantPopup(itemId) {
@@ -470,45 +546,75 @@
     }
   });
 
-  // ===================== CART FUNCTIONS =====================
   function addToCart(itemId) {
-  const item = menuItems.find(m => m.id === itemId);
-  const selectedVariant = selectedVariants[itemId];
-  const variantName = selectedVariant
-    ? selectedVariant.name
-    : (item.hasVariants ? item.variants[0].name : null);
+    const item = menuItems.find(m => m.id === itemId);
+    const selectedVariant = selectedVariants[itemId];
+    const variantName = selectedVariant
+      ? selectedVariant.name
+      : (item.hasVariants ? item.variants[0].name : null);
 
-  const existing = cart.find(
-    c => c.id === item.id && (c.variant || '') === (variantName || '')
-  );
+    // Cek status dari Firebase
+    const statusMap       = window.menuStatus || {};
+    const status          = statusMap[item.id] || {};
+    const menuDisabled    = status.disabled === true;
+    const disabledVariants = status.disabledVariants || {};
 
-  if (existing) {
-    existing.quantity++;
-  } else {
-    cart.push({
-      id: item.id,
-      name: item.name,
-      price: selectedVariant ? selectedVariant.price : item.price,
-      quantity: 1,
-      variant: variantName || ''   // standar: kalau nggak ada varian, simpan '' saja
-    });
+    if (menuDisabled) {
+      alert("Menu ini sedang tidak tersedia.");
+      return;
+    }
+
+    if (variantName && disabledVariants[variantName]) {
+      alert("Varian ini sedang tidak tersedia.");
+      return;
+    }
+
+    const existing = cart.find(
+      c => c.id === item.id && (c.variant || '') === (variantName || '')
+    );
+
+    if (existing) {
+      existing.quantity++;
+    } else {
+      cart.push({
+        id: item.id,
+        name: item.name,
+        price: selectedVariant ? selectedVariant.price : item.price,
+        quantity: 1,
+        variant: variantName || ''   // standar: kalau nggak ada varian, simpan '' saja
+      });
+    }
+
+    updateCart();
+    renderMenu();
   }
-
-  updateCart();
-  renderMenu();
-}
 
 
   function increaseQuantity(itemId, variantName) {
-  const item = cart.find(
-    c => c.id === itemId && (c.variant || '') === (variantName || '')
-  );
-  if (item) item.quantity++;
-  updateCart();
-  renderMenu();
-}
+    const statusMap        = window.menuStatus || {};
+    const status           = statusMap[itemId] || {};
+    const menuDisabled     = status.disabled === true;
+    const disabledVariants = status.disabledVariants || {};
 
-function decreaseQuantity(itemId, variantName) {
+    if (menuDisabled) {
+      alert("Menu ini sedang tidak tersedia.");
+      return;
+    }
+
+    if (variantName && disabledVariants[variantName]) {
+      alert("Varian ini sedang tidak tersedia.");
+      return;
+    }
+
+    const item = cart.find(
+      c => c.id === itemId && (c.variant || '') === (variantName || '')
+    );
+    if (item) item.quantity++;
+    updateCart();
+    renderMenu();
+  }
+
+  function decreaseQuantity(itemId, variantName) {
   const item = cart.find(
     c => c.id === itemId && (c.variant || '') === (variantName || '')
   );
@@ -525,14 +631,7 @@ function decreaseQuantity(itemId, variantName) {
 }
 
 
-  function decreaseQuantity(itemId, variantName) {
-    const item = cart.find(c => c.id === itemId && c.variant === variantName);
-    if (!item) return;
-    item.quantity--;
-    if (item.quantity <= 0) cart = cart.filter(c => !(c.id === itemId && c.variant === variantName));
-    updateCart();
-    renderMenu();
-  }
+
 
   function updateCart() {
     const cartSummary = document.getElementById('cartSummary');
@@ -601,12 +700,14 @@ function decreaseQuantity(itemId, variantName) {
 <script type="module">
   // Import Firebase v12 (modular, dari CDN)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-  import {
-    getDatabase,
-    ref,
-    push,
-    get
-  } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
+ import {
+  getDatabase,
+  ref,
+  push,
+  get,
+  onValue
+} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
+
 
   // CONFIG PROJECT KAMU (kantin-sekolah-e6aea)
   const firebaseConfig = {
@@ -620,10 +721,23 @@ function decreaseQuantity(itemId, variantName) {
   };
 
   // Init Firebase
-  const app = initializeApp(firebaseConfig);
-  const db  = getDatabase(app);
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
 
-  console.log("✅ Terhubung ke Firebase kantin-sekolah-e6aea");
+console.log("✅ Terhubung ke Firebase kantin-sekolah-e6aea");
+
+// === LISTENER REALTIME UNTUK STATUS MENU (ON/OFF + VARIAN) ===
+const menuStatusRef = ref(db, "menuStatus");
+
+onValue(menuStatusRef, (snapshot) => {
+  // simpan status ke global supaya bisa dipakai di renderMenu()
+  window.menuStatus = snapshot.val() || {};
+  if (typeof renderMenu === "function") {
+    renderMenu();
+  }
+});
+
+
 
   // ======================================================
   //  SUBMIT ORDER  (dipanggil dari form: onsubmit="submitOrder(event)")
