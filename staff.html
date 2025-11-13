@@ -6,44 +6,77 @@
   <title>Dashboard Staff Kantin</title>
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <style>
-    body { box-sizing: border-box; }
-    .status-pill {
-      border-radius: 9999px;
-      padding: 4px 10px;
-      font-size: 12px;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-  </style>
+ <style>
+  body { box-sizing: border-box; }
+
+  .status-pill {
+    border-radius: 9999px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* === ANIMASI BULAT2 SAMA SEPERTI index.html === */
+  @keyframes floatRotate1 {
+    0%   { transform: translate(0,0) rotate(0deg) scale(1); }
+    33%  { transform: translate(30px,-20px) rotate(120deg) scale(1.1); }
+    66%  { transform: translate(-20px,30px) rotate(240deg) scale(0.9); }
+    100% { transform: translate(0,0) rotate(360deg) scale(1); }
+  }
+  @keyframes floatRotate2 {
+    0%   { transform: translate(0,0) rotate(0deg) scale(1); }
+    33%  { transform: translate(-40px,25px) rotate(-120deg) scale(0.9); }
+    66%  { transform: translate(25px,-30px) rotate(-240deg) scale(1.15); }
+    100% { transform: translate(0,0) rotate(-360deg) scale(1); }
+  }
+
+  .animated-circle-1 {
+    animation: floatRotate1 5s ease-in-out infinite;
+  }
+  .animated-circle-2 {
+    animation: floatRotate2 6s ease-in-out infinite;
+  }
+</style>
+
 </head>
 <body class="bg-gradient-to-br from-slate-50 to-slate-200 min-h-screen">
 
   <!-- HEADER -->
-  <header class="bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-4 px-6 shadow-lg">
-    <div class="max-w-6xl mx-auto flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <a href="index.html" class="px-3 py-1 rounded-lg hover:bg-white/20 transition">
-          ← Halaman Siswa
-        </a>
-        <h1 class="text-2xl font-bold">Dashboard Staff Kantin</h1>
-      </div>
-      <div class="flex items-center gap-3 text-sm">
-        <span id="connectionStatus" class="px-3 py-1 rounded-full bg-black/20">Menyambung...</span>
-      </div>
+ <!-- HEADER -->
+<header class="relative overflow-hidden bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-4 px-6 shadow-lg">
+  <!-- bulat-bulat animasi -->
+  <div class="pointer-events-none absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 animated-circle-1"></div>
+  <div class="pointer-events-none absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full -ml-16 -mb-16 animated-circle-2"></div>
+
+  <!-- konten header -->
+  <div class="relative max-w-6xl mx-auto flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <!-- logo kecil di kiri (pakai logo.png yang sama dengan index.html) -->
+      <img src="logo.png"
+           alt="Logo Kantin"
+           class="w-10 h-10 object-contain"
+           onerror="this.style.display='none'">
+      <h1 class="text-2xl font-bold">Dashboard Staff</h1>
     </div>
-  </header>
+    <div class="flex items-center gap-3 text-sm">
+      <span id="connectionStatus" class="px-3 py-1 rounded-full bg-black/20">Menyambung...</span>
+    </div>
+  </div>
+</header>
+
+
 
   <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
     <!-- FILTER STATUS -->
     <div class="bg-white rounded-2xl shadow-md p-4 mb-6 flex flex-wrap gap-2 items-center">
-      <span class="text-sm font-semibold text-gray-700 mr-2">Filter status:</span>
+      <span class="text-sm font-semibold text-gray-700 mr-2">Status:</span>
       <button class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-slate-800 text-white"
               data-status="all">Semua</button>
       <button class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800"
-              data-status="pending">Pending</button>
+        data-status="pending">Dalam Antrian</button>
       <button class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800"
               data-status="processing">Diproses</button>
       <button class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-purple-100 text-purple-800"
@@ -118,13 +151,17 @@
     const sumProcessingEl = document.getElementById("sum-processing");
     const sumReadyEl      = document.getElementById("sum-ready");
 
-    let currentFilter = "pending"; // kalau mau default semua: "all"
-    // tandai filter tombol awal
-    document.querySelectorAll(".status-filter").forEach(btn => {
-      if (btn.dataset.status === currentFilter) {
-        btn.classList.add("ring-2", "ring-offset-1", "ring-orange-400");
-      }
-    });
+    // filter status yang sedang aktif di UI
+let currentFilter   = "all";      // ✅ default: tampilkan SEMUA order
+let latestEntries   = [];         // ✅ simpan data snapshot terakhir
+
+// tandai filter tombol awal (Semua)
+document.querySelectorAll(".status-filter").forEach(btn => {
+  if (btn.dataset.status === currentFilter) {
+    btn.classList.add("ring-2", "ring-offset-1", "ring-orange-400");
+  }
+});
+
 
     const STATUS_LABEL = {
       pending:    "Pending",
@@ -148,29 +185,34 @@
 
     // ============ LISTENER REALTIME ============
 
-    onValue(ordersRef, (snapshot) => {
-      const data = snapshot.val() || {};
+onValue(ordersRef, (snapshot) => {
+  const data = snapshot.val() || {};
 
-      connectionStatus.textContent = "Terhubung";
-      connectionStatus.className =
-        "px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold";
+  connectionStatus.textContent = "Online";
+  connectionStatus.className =
+    "px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold";
 
-      const entries = Object.entries(data).map(([id, order]) => ({
-        id,
-        ...order
-      }));
+  const entries = Object.entries(data).map(([id, order]) => ({
+    id,
+    ...order
+  }));
 
-      // sort by createdAt terbaru di atas
-      entries.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  // sort by createdAt terbaru
+  entries.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
-      renderSummary(entries);
-      renderOrders(entries);
-    }, (error) => {
-      console.error(error);
-      connectionStatus.textContent = "Gagal terhubung";
-      connectionStatus.className =
-        "px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold";
-    });
+  // ✅ simpan snapshot terakhir ke variabel global
+  latestEntries = entries;
+
+  // render ringkasan & daftar berdasarkan filter aktif
+  renderSummary(latestEntries);
+  renderOrders(latestEntries);
+}, (error) => {
+  console.error(error);
+  connectionStatus.textContent = "Gagal terhubung";
+  connectionStatus.className =
+    "px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold";
+});
+
 
     // ============ RENDER SUMMARY ============
 
@@ -330,20 +372,19 @@
     // ============ FILTER STATUS BUTTONS ============
 
     document.querySelectorAll(".status-filter").forEach(btn => {
-      btn.addEventListener("click", () => {
-        currentFilter = btn.dataset.status;
+  btn.addEventListener("click", () => {
+    currentFilter = btn.dataset.status;
 
-        document.querySelectorAll(".status-filter").forEach(b => {
-          b.classList.remove("ring-2", "ring-offset-1", "ring-orange-400");
-        });
-        btn.classList.add("ring-2", "ring-offset-1", "ring-orange-400");
-
-        // render ulang pakai data terakhir di DOM:
-        // cara gampang: trigger ulang listener onValue dengan cara kecil — tapi di sini
-        // kita biarkan; renderOrders akan dipanggil otomatis saat ada perubahan data berikutnya.
-        // Kalau mau langsung, kita bisa simpan entries terakhir di variabel global.
-      });
+    document.querySelectorAll(".status-filter").forEach(b => {
+      b.classList.remove("ring-2", "ring-offset-1", "ring-orange-400");
     });
+    btn.classList.add("ring-2", "ring-offset-1", "ring-orange-400");
+
+    // ✅ langsung render ulang list pakai data terakhir
+    renderOrders(latestEntries);
+  });
+});
+
   </script>
 </body>
 </html>
