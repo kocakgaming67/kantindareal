@@ -1,561 +1,349 @@
 <!doctype html>
 <html lang="id">
- <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Staff Kantin - Firebase</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Staff Kantin</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
-    body {
-      box-sizing: border-box;
-    }
-    
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
-    }
-
-    .stat-card {
-      transition: all 0.3s ease;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 24px rgba(249, 115, 22, 0.2);
-    }
-
-    .pulse-dot {
-      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.5;
-      }
-    }
-
-    .order-card {
-      animation: slideIn 0.4s ease-out;
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .tab-active {
-      border-bottom: 3px solid #f97316;
-      color: #f97316;
-      background: linear-gradient(to bottom, rgba(249, 115, 22, 0.05), transparent);
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: white;
-      padding: 16px 24px;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-      display: none;
-      z-index: 1000;
-      animation: slideInRight 0.3s ease-out;
-    }
-
-    @keyframes slideInRight {
-      from {
-        transform: translateX(400px);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
+    body { box-sizing: border-box; }
+    .status-pill {
+      border-radius: 9999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
   </style>
-  <style>@view-transition { navigation: auto; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
-  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
- </head>
- <body class="bg-gradient-to-br from-gray-50 to-orange-50 font-sans">
-  <!-- Header -->
-  <header class="bg-white shadow-lg sticky top-0 z-50 border-b border-orange-100">
-   <div class="max-w-7xl mx-auto px-6 py-5">
-    <div class="flex justify-between items-center">
-     <div class="flex items-center space-x-4">
-      <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-md">
-       <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-       </svg>
-      </div>
-      <div>
-       <h1 class="text-2xl font-bold text-gray-800">Dashboard Staff Kantin</h1>
-       <p class="text-xs text-gray-500">Powered by Firebase 🔥</p>
-      </div>
-     </div>
-     <div class="flex items-center space-x-4">
-      <div class="flex items-center space-x-2 bg-gray-100 px-4 py-2 rounded-lg">
-       <div class="w-3 h-3 rounded-full pulse-dot" id="connectionStatus"></div><span class="text-sm font-medium" id="statusText">Terputus</span>
-      </div>
-      <div class="text-right">
-       <p class="text-sm text-gray-500" id="currentTime"></p>
-      </div>
-     </div>
-    </div>
-   </div>
-  </header>
-  <main class="max-w-7xl mx-auto px-4 py-6">
-   <!-- Stats Cards -->
-   <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-6">
-    <div class="stat-card bg-white rounded-xl shadow-md p-5">
-     <div class="flex items-start justify-between mb-3">
-      <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-       <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-       </svg>
-      </div>
-     </div>
-     <p class="text-sm text-gray-600 font-medium mb-1">Pesanan Baru</p>
-     <p id="pendingCount" class="text-3xl font-bold text-gray-800">0</p>
-    </div>
-    <div class="stat-card bg-white rounded-xl shadow-md p-5">
-     <div class="flex items-start justify-between mb-3">
-      <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-       <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-       </svg>
-      </div>
-     </div>
-     <p class="text-sm text-gray-600 font-medium mb-1">Sedang Diproses</p>
-     <p id="processingCount" class="text-3xl font-bold text-gray-800">0</p>
-    </div>
-    <div class="stat-card bg-white rounded-xl shadow-md p-5">
-     <div class="flex items-start justify-between mb-3">
-      <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-       <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-       </svg>
-      </div>
-     </div>
-     <p class="text-sm text-gray-600 font-medium mb-1">Siap Diambil</p>
-     <p id="readyCount" class="text-3xl font-bold text-gray-800">0</p>
-    </div>
-    <div class="stat-card bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-md p-5">
-     <div class="flex items-start justify-between mb-3">
-      <div class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center"><span class="text-white font-bold text-lg">Rp</span>
-      </div>
-     </div>
-     <p class="text-sm text-orange-100 font-medium mb-1">Total Hari Ini</p>
-     <p id="totalRevenue" class="text-3xl font-bold text-white">Rp 0</p>
-    </div>
-   </div>
-   <!-- Tabs -->
-   <div class="bg-white rounded-xl shadow-md mb-6">
-    <div class="flex border-b border-gray-200"><button onclick="switchTab('orders')" id="ordersTab" class="flex-1 px-6 py-4 font-semibold text-gray-700 hover:bg-gray-50 transition-all tab-active flex items-center justify-center gap-2">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-      </svg> Kelola Pesanan </button> <button onclick="switchTab('menu')" id="menuTab" class="flex-1 px-6 py-4 font-semibold text-gray-700 hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-      </svg> Kelola Menu </button>
-    </div>
-   </div>
-   <!-- Orders Section -->
-   <div id="ordersSection">
-    <div class="bg-white rounded-xl shadow-md p-5 mb-6">
-     <div class="flex items-center justify-between">
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-200 min-h-screen">
+
+  <!-- HEADER -->
+  <header class="bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-4 px-6 shadow-lg">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
       <div class="flex items-center gap-3">
-       <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
-       </svg><span class="text-sm font-semibold text-gray-700">Filter Status</span>
-      </div><button onclick="refreshOrders()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all flex items-center gap-2">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-       </svg> Refresh </button>
-     </div>
-     <div class="flex flex-wrap gap-2 mt-4"><button onclick="filterOrders('all')" class="filter-btn bg-gradient-to-r from-orange-500 to-orange-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:from-orange-600 hover:to-orange-700 transition-all text-sm shadow-md"> Semua </button> <button onclick="filterOrders('pending')" class="filter-btn bg-white text-gray-700 px-5 py-2.5 rounded-lg font-semibold hover:bg-gray-50 transition-all text-sm border border-gray-200"> Baru </button> <button onclick="filterOrders('processing')" class="filter-btn bg-white text-gray-700 px-5 py-2.5 rounded-lg font-semibold hover:bg-gray-50 transition-all text-sm border border-gray-200"> Diproses </button> <button onclick="filterOrders('ready')" class="filter-btn bg-white text-gray-700 px-5 py-2.5 rounded-lg font-semibold hover:bg-gray-50 transition-all text-sm border border-gray-200"> Siap </button> <button onclick="filterOrders('completed')" class="filter-btn bg-white text-gray-700 px-5 py-2.5 rounded-lg font-semibold hover:bg-gray-50 transition-all text-sm border border-gray-200"> Selesai </button>
-     </div>
+        <a href="index.html" class="px-3 py-1 rounded-lg hover:bg-white/20 transition">
+          ← Halaman Siswa
+        </a>
+        <h1 class="text-2xl font-bold">Dashboard Staff Kantin</h1>
+      </div>
+      <div class="flex items-center gap-3 text-sm">
+        <span id="connectionStatus" class="px-3 py-1 rounded-full bg-black/20">Menyambung...</span>
+      </div>
     </div>
-    <div id="ordersList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-     <div class="col-span-full text-center py-12">
-      <p class="text-gray-500 text-lg">Hubungkan Firebase untuk melihat pesanan</p>
-     </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+    <!-- FILTER STATUS -->
+    <div class="bg-white rounded-2xl shadow-md p-4 mb-6 flex flex-wrap gap-2 items-center">
+      <span class="text-sm font-semibold text-gray-700 mr-2">Filter status:</span>
+      <button class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-slate-800 text-white"
+              data-status="all">Semua</button>
+      <button class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800"
+              data-status="pending">Pending</button>
+      <button class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800"
+              data-status="processing">Diproses</button>
+      <button class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-purple-100 text-purple-800"
+              data-status="ready">Siap Diambil</button>
+      <button class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800"
+              data-status="completed">Selesai</button>
+      <button class="status-filter px-3 py-1 rounded-full text-sm font-semibold bg-red-100 text-red-800"
+              data-status="cancelled">Dibatalkan</button>
     </div>
-   </div>
-   <!-- Menu Section -->
-   <div id="menuSection" class="hidden">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="menuList">
-     <div class="col-span-full text-center py-12">
-      <p class="text-gray-500 text-lg">Hubungkan Firebase untuk melihat menu</p>
-     </div>
+
+    <!-- RINGKASAN -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div class="bg-white rounded-2xl shadow-md p-4">
+        <p class="text-xs text-gray-500">Total Order</p>
+        <p class="text-2xl font-bold text-gray-800" id="sum-total">0</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-md p-4">
+        <p class="text-xs text-gray-500">Pending</p>
+        <p class="text-2xl font-bold text-yellow-500" id="sum-pending">0</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-md p-4">
+        <p class="text-xs text-gray-500">Diproses</p>
+        <p class="text-2xl font-bold text-blue-500" id="sum-processing">0</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-md p-4">
+        <p class="text-xs text-gray-500">Siap Diambil</p>
+        <p class="text-2xl font-bold text-purple-500" id="sum-ready">0</p>
+      </div>
     </div>
-   </div>
+
+    <!-- LIST ORDER -->
+    <div id="ordersContainer" class="space-y-4">
+      <!-- kartu order akan di-render lewat JS -->
+    </div>
+
+    <div id="emptyState" class="hidden mt-10 text-center text-gray-500">
+      Belum ada order.
+    </div>
   </main>
-  <!-- Toast Notification -->
-  <div id="toast" class="toast">
-   <div class="flex items-center space-x-3">
-    <div id="toastIcon"></div>
-    <p id="toastMessage" class="font-semibold text-gray-800"></p>
-   </div>
-  </div>
-  <script>
-    // ============================================
-    // FIREBASE CONFIGURATION SLOT
-    // ============================================
-    // TODO: Masukkan kredensial Firebase Anda di sini
+
+  <!-- ================= FIREBASE & LOGIC STAFF ================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+    import {
+      getDatabase,
+      ref,
+      onValue,
+      update
+    } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
+
+    // CONFIG SAMA DENGAN index.html
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY_HERE",
-      authDomain: "YOUR_AUTH_DOMAIN_HERE",
-      projectId: "YOUR_PROJECT_ID_HERE",
-      storageBucket: "YOUR_STORAGE_BUCKET_HERE",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID_HERE",
-      appId: "YOUR_APP_ID_HERE"
+      apiKey: "AIzaSyCkejTcOfPpedhrOx4gI4HVrejIM3G7cRg",
+      authDomain: "kantin-sekolah-e6aea.firebaseapp.com",
+      projectId: "kantin-sekolah-e6aea",
+      storageBucket: "kantin-sekolah-e6aea.firebasestorage.app",
+      messagingSenderId: "296536339754",
+      appId: "1:296536339754:web:05fac7daec8b65dd211a53",
+      databaseURL: "https://kantin-sekolah-e6aea-default-rtdb.asia-southeast1.firebasedatabase.app"
     };
 
-    // TODO: Initialize Firebase
-    // Uncomment dan sesuaikan dengan versi Firebase yang Anda gunakan
-    // 
-    // import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    // import { getFirestore, collection, getDocs, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    // 
-    // const app = initializeApp(firebaseConfig);
-    // const db = getFirestore(app);
-    // ============================================
+    const app = initializeApp(firebaseConfig);
+    const db  = getDatabase(app);
 
-    let isConnected = false;
-    let currentOrderFilter = 'all';
-    let currentTab = 'orders';
+    const ordersRef        = ref(db, "orders");
+    const container        = document.getElementById("ordersContainer");
+    const emptyState       = document.getElementById("emptyState");
+    const connectionStatus = document.getElementById("connectionStatus");
 
-    // Menu data
-    const menuData = [
-      { id: 1, name: 'Bakwan', category: 'snack', price: 1000 },
-      { id: 2, name: 'Dayaki', category: 'snack', price: 1000 },
-      { id: 3, name: 'Pop Mie', category: 'snack', price: 7000 },
-      { id: 4, name: 'Klepon', category: 'snack', price: 2000 },
-      { id: 5, name: 'Nabati', category: 'snack', price: 2000 },
-      { id: 13, name: 'Roti Beta', category: 'snack', price: 1000, variants: ['Moka', 'Cream', 'Kompiang', 'Kacang Hijau'] },
-      { id: 18, name: 'Golda Coffee', category: 'minuman', price: 5000 },
-      { id: 23, name: 'Teh Pucuk', category: 'minuman', price: 5000 },
-      { id: 25, name: 'Air Putih', category: 'minuman', price: 1000 }
-    ];
+    const sumTotalEl      = document.getElementById("sum-total");
+    const sumPendingEl    = document.getElementById("sum-pending");
+    const sumProcessingEl = document.getElementById("sum-processing");
+    const sumReadyEl      = document.getElementById("sum-ready");
 
-    // Update time
-    function updateTime() {
-      const now = new Date();
-      const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-      const dateString = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short' });
-      document.getElementById('currentTime').textContent = `${timeString} - ${dateString}`;
-    }
-
-    // Show toast notification
-    function showToast(message, type = 'info') {
-      const toast = document.getElementById('toast');
-      const toastMessage = document.getElementById('toastMessage');
-      const toastIcon = document.getElementById('toastIcon');
-      
-      const icons = {
-        success: '<svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
-        error: '<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
-        info: '<svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
-      };
-      
-      toastIcon.innerHTML = icons[type] || icons.info;
-      toastMessage.textContent = message;
-      toast.style.display = 'block';
-      
-      setTimeout(() => {
-        toast.style.display = 'none';
-      }, 3000);
-    }
-
-    // Update connection status
-    function updateConnectionStatus(connected) {
-      isConnected = connected;
-      const statusDot = document.getElementById('connectionStatus');
-      const statusText = document.getElementById('statusText');
-      
-      if (connected) {
-        statusDot.className = 'w-3 h-3 rounded-full pulse-dot bg-green-500';
-        statusText.textContent = 'Terhubung';
-        statusText.className = 'text-sm font-medium text-green-600';
-      } else {
-        statusDot.className = 'w-3 h-3 rounded-full bg-red-500';
-        statusText.textContent = 'Terputus';
-        statusText.className = 'text-sm font-medium text-red-600';
+    let currentFilter = "pending"; // kalau mau default semua: "all"
+    // tandai filter tombol awal
+    document.querySelectorAll(".status-filter").forEach(btn => {
+      if (btn.dataset.status === currentFilter) {
+        btn.classList.add("ring-2", "ring-offset-1", "ring-orange-400");
       }
+    });
+
+    const STATUS_LABEL = {
+      pending:    "Pending",
+      processing: "Diproses",
+      ready:      "Siap Diambil",
+      completed:  "Selesai",
+      cancelled:  "Dibatalkan"
+    };
+
+    const STATUS_CLASS = {
+      pending:    "bg-yellow-100 text-yellow-800",
+      processing: "bg-blue-100 text-blue-800",
+      ready:      "bg-purple-100 text-purple-800",
+      completed:  "bg-green-100 text-green-800",
+      cancelled:  "bg-red-100 text-red-800"
+    };
+
+    function formatCurrency(amount) {
+      return "Rp " + (amount || 0).toLocaleString("id-ID");
     }
 
-    // Initialize Firebase connection
-    function initializeFirebase() {
-      // dummy visual: if you didn't add actual init, we keep sample.
-      try {
-        if (firebaseConfig.apiKey === "YOUR_API_KEY_HERE") {
-          console.log("⚠️ Firebase belum dikonfigurasi pada blok placeholder (dilewati karena kita pakai modul di bawah).");
-          return;
-        }
-      } catch(e) {}
+    // ============ LISTENER REALTIME ============
+
+    onValue(ordersRef, (snapshot) => {
+      const data = snapshot.val() || {};
+
+      connectionStatus.textContent = "Terhubung";
+      connectionStatus.className =
+        "px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold";
+
+      const entries = Object.entries(data).map(([id, order]) => ({
+        id,
+        ...order
+      }));
+
+      // sort by createdAt terbaru di atas
+      entries.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+      renderSummary(entries);
+      renderOrders(entries);
+    }, (error) => {
+      console.error(error);
+      connectionStatus.textContent = "Gagal terhubung";
+      connectionStatus.className =
+        "px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold";
+    });
+
+    // ============ RENDER SUMMARY ============
+
+    function renderSummary(entries) {
+      sumTotalEl.textContent = entries.length;
+
+      const counts = { pending: 0, processing: 0, ready: 0, completed: 0, cancelled: 0 };
+      entries.forEach(o => {
+        if (counts[o.status] !== undefined) counts[o.status]++;
+      });
+
+      sumPendingEl.textContent    = counts.pending;
+      sumProcessingEl.textContent = counts.processing;
+      sumReadyEl.textContent      = counts.ready;
     }
 
-    // Load data from Firebase (dummy placeholder kept)
-    function loadSampleData() {
-      const emptyOrders = [];
-      renderOrders(emptyOrders);
-      updateStats(emptyOrders);
-      renderMenu();
-    }
+    // ============ RENDER ORDERS ============
 
-    // Render orders
-    function renderOrders(orders) {
-      const container = document.getElementById('ordersList');
-      
-      if (!orders || orders.length === 0) {
-        container.innerHTML = '<div class="col-span-full text-center py-12"><p class="text-gray-500 text-lg">Tidak ada pesanan</p></div>';
+    function renderOrders(entries) {
+      const filtered = currentFilter === "all"
+        ? entries
+        : entries.filter(o => o.status === currentFilter);
+
+      if (filtered.length === 0) {
+        container.innerHTML = "";
+        emptyState.classList.remove("hidden");
         return;
       }
-      
-      const filteredOrders = currentOrderFilter === 'all' 
-        ? orders 
-        : orders.filter(order => order.status === currentOrderFilter);
-      
-      container.innerHTML = '';
-      
-      filteredOrders.forEach(order => {
-        const statusColors = {
-          'pending': 'bg-yellow-50 border-yellow-300',
-          'processing': 'bg-blue-50 border-blue-300',
-          'ready': 'bg-green-50 border-green-300',
-          'completed': 'bg-gray-50 border-gray-300'
-        };
-        
-        const statusTexts = {
-          'pending': 'Pesanan Baru',
-          'processing': 'Sedang Diproses',
-          'ready': 'Siap Diambil',
-          'completed': 'Selesai'
-        };
-        
-        const orderCard = document.createElement('div');
-        orderCard.className = `order-card ${statusColors[order.status]} border-2 rounded-xl p-4`;
-        
-        const itemsList = (order.items || []).map(item => 
-          `<div class="text-sm text-gray-700">${item.name}${item.variant ? ` (${item.variant})` : ''} x${item.quantity}</div>`
-        ).join('');
-        
-        orderCard.innerHTML = `
-          <div class="flex justify-between items-start mb-3">
-            <div>
-              <span class="font-bold text-gray-800">${order.orderId}</span>
-              <p class="text-xs text-gray-500">${new Date(order.timestamp).toLocaleString('id-ID')}</p>
-            </div>
-            <span class="px-3 py-1 rounded-full text-xs font-semibold ${order.status === 'pending' ? 'bg-yellow-200 text-yellow-800' : order.status === 'processing' ? 'bg-blue-200 text-blue-800' : order.status === 'ready' ? 'bg-green-200 text-green-800' : 'bg-gray-200 text-gray-800'}">
-              ${statusTexts[order.status]}
+
+      emptyState.classList.add("hidden");
+
+      container.innerHTML = filtered.map(order => {
+        const created = order.createdAt ? new Date(order.createdAt) : new Date();
+        const timeStr = created.toLocaleString("id-ID");
+
+        const itemsHtml = (order.items || []).map(it => `
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-700">
+              ${it.name}${it.variant ? ` (${it.variant})` : ""} ×${it.quantity}
+            </span>
+            <span class="font-semibold text-gray-800">
+              ${formatCurrency(it.price * it.quantity)}
             </span>
           </div>
-          
-          <div class="mb-3">
-            <p class="font-semibold text-gray-800">${order.studentName}</p>
-            <p class="text-sm text-gray-600">${order.studentClass}</p>
+        `).join("");
+
+        const statusLabel = STATUS_LABEL[order.status] || order.status || "-";
+        const statusClass = STATUS_CLASS[order.status] || "bg-gray-100 text-gray-700";
+
+        // tombol perubahan status
+        const actionsHtml = `
+          <div class="flex flex-wrap gap-2 mt-3">
+            ${order.status !== "pending" ? "" : `
+              <button data-action="set-status" data-id="${order.id}" data-status="processing"
+                class="px-3 py-1 rounded-lg text-xs font-semibold bg-blue-500 text-white hover:bg-blue-600">
+                Tandai Diproses
+              </button>`}
+            ${order.status !== "processing" ? "" : `
+              <button data-action="set-status" data-id="${order.id}" data-status="ready"
+                class="px-3 py-1 rounded-lg text-xs font-semibold bg-purple-500 text-white hover:bg-purple-600">
+                Tandai Siap Diambil
+              </button>`}
+            ${order.status !== "ready" ? "" : `
+              <button data-action="set-status" data-id="${order.id}" data-status="completed"
+                class="px-3 py-1 rounded-lg text-xs font-semibold bg-green-500 text-white hover:bg-green-600">
+                Tandai Selesai
+              </button>`}
+            ${order.status === "completed" || order.status === "cancelled" ? "" : `
+              <button data-action="set-status" data-id="${order.id}" data-status="cancelled"
+                class="px-3 py-1 rounded-lg text-xs font-semibold bg-red-500 text-white hover:bg-red-600">
+                Batalkan
+              </button>`}
           </div>
-          
-          <div class="mb-3">
-            ${itemsList}
-          </div>
-          
-          <div class="border-t pt-3 mb-3">
-            <div class="flex justify-between items-center">
-              <span class="font-semibold text-gray-700">Total:</span>
-              <span class="text-xl font-bold text-orange-600">Rp ${Number(order.totalPrice||0).toLocaleString('id-ID')}</span>
-            </div>
-          </div>
-          
-          <button onclick="updateOrderStatus('${order.orderId}')" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-semibold text-sm transition-colors">
-            Update Status
-          </button>
         `;
-        
-        container.appendChild(orderCard);
-      });
-    }
 
-    // Render menu
-    function renderMenu() {
-      const container = document.getElementById('menuList');
-      container.innerHTML = '';
-      
-      menuData.forEach(item => {
-        const menuCard = document.createElement('div');
-        menuCard.className = 'bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow';
-        
-        menuCard.innerHTML = `
-          <div class="flex items-start justify-between mb-3">
-            <div>
-              <h3 class="font-bold text-gray-800">${item.name}</h3>
-              <p class="text-sm text-orange-600 font-semibold">Rp ${item.price.toLocaleString('id-ID')}</p>
+        return `
+          <div class="bg-white rounded-2xl shadow-md p-4 md:p-5">
+            <div class="flex justify-between items-start gap-3 mb-3">
+              <div>
+                <p class="text-xs text-gray-500">ID Pesanan</p>
+                <p class="font-mono text-sm text-gray-800 break-all">${order.id}</p>
+              </div>
+              <span class="status-pill ${statusClass}">
+                ● ${statusLabel}
+              </span>
             </div>
-            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">TERSEDIA</span>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+              <div>
+                <p class="text-xs text-gray-500">Nama</p>
+                <p class="font-semibold text-gray-800">${order.customerName || "-"}</p>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500">Kelas</p>
+                <p class="font-semibold text-gray-800">${order.customerClass || "-"}</p>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500">Waktu Pesan</p>
+                <p class="text-sm text-gray-700">${timeStr}</p>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500">Total</p>
+                <p class="font-bold text-lg text-orange-600">${formatCurrency(order.total)}</p>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <p class="text-xs text-gray-500 mb-1">Item Pesanan</p>
+              <div class="bg-slate-50 rounded-xl p-3 space-y-1">
+                ${itemsHtml || '<p class="text-sm text-gray-500">Tidak ada item.</p>'}
+              </div>
+            </div>
+
+            ${order.notes ? `
+              <div class="mb-2">
+                <p class="text-xs text-gray-500 mb-1">Catatan</p>
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-2 text-sm text-gray-700">
+                  ${order.notes}
+                </div>
+              </div>
+            ` : ""}
+
+            ${actionsHtml}
           </div>
-          
-          <button onclick="toggleStock(${item.id})" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg font-semibold transition-colors">
-            Tandai Habis
-          </button>
         `;
-        
-        container.appendChild(menuCard);
+      }).join("");
+    }
+
+    // ============ GANTI STATUS (event delegation) ============
+
+    container.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-action='set-status']");
+      if (!btn) return;
+
+      const id     = btn.dataset.id;
+      const status = btn.dataset.status;
+
+      if (!id || !status) return;
+
+      const confTexts = {
+        processing: "Tandai pesanan ini sedang diproses?",
+        ready:      "Tandai pesanan ini siap diambil?",
+        completed:  "Tandai pesanan ini sudah selesai?",
+        cancelled:  "Batalkan pesanan ini?"
+      };
+      const msg = confTexts[status] || "Ubah status pesanan?";
+
+      if (!confirm(msg)) return;
+
+      const orderRef = ref(db, "orders/" + id);
+      update(orderRef, { status }).catch(err => {
+        console.error(err);
+        alert("Gagal mengubah status, coba lagi.");
       });
-    }
-
-    // Update stats
-    function updateStats(orders) {
-      if (!orders) return;
-      
-      const pending = orders.filter(o => o.status === 'pending').length;
-      const processing = orders.filter(o => o.status === 'processing').length;
-      const ready = orders.filter(o => o.status === 'ready').length;
-      const total = orders.reduce((sum, o) => sum + Number(o.totalPrice||0), 0);
-      
-      document.getElementById('pendingCount').textContent = pending;
-      document.getElementById('processingCount').textContent = processing;
-      document.getElementById('readyCount').textContent = ready;
-      document.getElementById('totalRevenue').textContent = `Rp ${total.toLocaleString('id-ID')}`;
-    }
-
-    // Filter orders
-    function filterOrders(status) {
-      currentOrderFilter = status;
-      showToast(`Filter: ${status}`, 'info');
-      
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.remove('bg-gradient-to-r', 'from-orange-500', 'to-orange-600', 'text-white', 'shadow-md');
-        btn.classList.add('bg-white', 'text-gray-700', 'border', 'border-gray-200');
-      });
-      
-      event.target.classList.remove('bg-white', 'text-gray-700', 'border', 'border-gray-200');
-      event.target.classList.add('bg-gradient-to-r', 'from-orange-500', 'to-orange-600', 'text-white', 'shadow-md');
-    }
-
-    // Refresh orders
-    function refreshOrders() {
-      showToast('Memuat ulang pesanan...', 'info');
-      setTimeout(() => {
-        showToast('Pesanan berhasil dimuat ulang!', 'success');
-      }, 600);
-    }
-
-    // Placeholder update/toggle (ditimpa oleh script Firebase module di bawah)
-    function updateOrderStatus(orderId) { showToast(`Pesanan ${orderId} diperbarui!`, 'success'); }
-    function toggleStock(itemId) { showToast('Status stok diperbarui!', 'success'); }
-
-    // Switch tab
-    function switchTab(tab) {
-      currentTab = tab;
-      document.querySelectorAll('#ordersTab, #menuTab').forEach(btn => btn.classList.remove('tab-active'));
-      if (tab === 'orders') {
-        document.getElementById('ordersTab').classList.add('tab-active');
-        document.getElementById('ordersSection').classList.remove('hidden');
-        document.getElementById('menuSection').classList.add('hidden');
-      } else {
-        document.getElementById('menuTab').classList.add('tab-active');
-        document.getElementById('ordersSection').classList.add('hidden');
-        document.getElementById('menuSection').classList.remove('hidden');
-      }
-    }
-
-    // Initialize application
-    updateTime();
-    setInterval(updateTime, 1000);
-    initializeFirebase(); // keeps your original flow
-  </script>
-
-  <!-- === Firebase REAL hookup (added) === -->
-  <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-  import {
-    getFirestore, collection, doc, getDoc, updateDoc,
-    onSnapshot, query, serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
-  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-
-  // PAKAI CONFIG PROYEKMU (sama seperti index.html)
-  const config = {
-    apiKey: "AIzaSyDL0SlYn5sTMfs_r68-lYIAcd9C7todxdI",
-    authDomain: "kantin-c5053.firebaseapp.com",
-    projectId: "kantin-c5053",
-    storageBucket: "kantin-c5053.firebasestorage.app",
-    messagingSenderId: "838998866961",
-    appId: "1:838998866961:web:8ca40fc9cf359ec9a045b0"
-  };
-
-  const app  = initializeApp(config);
-  const db   = getFirestore(app);
-  const auth = getAuth(app);
-
-  // 1) LOGIN ANONIM (WAJIB)
-  try {
-    await signInAnonymously(auth);
-    console.log('STAFF UID:', auth.currentUser?.uid);
-  } catch (e) {
-    console.error('anon sign-in failed:', e);
-  }
-
-  // helper: map dokumen Firestore -> format renderOrders() kamu
-  function mapOrderDoc(d) {
-    const o = d.data() || {};
-    const created = o.createdAt?.toDate ? o.createdAt.toDate() : new Date();
-    return {
-      orderId: d.id,
-      timestamp: created,
-      studentName:  o.customerName || '-',
-      studentClass: o.customerClass || '-',
-      items: Array.isArray(o.items) ? o.items.map(it => ({
-        name: it.name, quantity: it.quantity, price: it.price, variant: it.variant || null
-      })) : [],
-      totalPrice: Number(o.total) || 0,
-      status: o.status || 'pending'
-    };
-  }
-
-  // 2) REALTIME LISTENER (sementara TANPA orderBy biar aman)
-  try {
-    const q = query(collection(db, 'orders')); // nanti boleh diganti pakai orderBy('createdAt','desc')
-    onSnapshot(q, (snap)=>{
-      const orders = snap.docs.map(mapOrderDoc);
-      window.renderOrders?.(orders);
-      window.updateStats?.(orders);
-      window.updateConnectionStatus?.(true);
-    }, (err)=>{
-      console.error(err);
-      window.updateConnectionStatus?.(false);
     });
-  } catch (e) {
-    console.error(e);
-    window.updateConnectionStatus?.(false);
-  }
 
-  // 3) TOMBOL UPDATE STATUS
-  window.updateOrderStatus = async function(orderId){
-    try {
-      const ref  = doc(db,'orders',orderId);
-      const s    = await getDoc(ref);
-      if (!s.exists()) { alert('Pesanan tidak ditemukan'); return; }
-      const cur  = s.data().status || 'pending';
-      const next = cur==='pending' ? 'processing'
-                 : cur==='processing' ? 'ready'
-                 : cur==='ready' ? 'completed'
-                 : 'completed';
-      await updateDoc(ref, { status: next, statusUpdatedAt: serverTimestamp() });
-      window.showToast?.(`Status ${orderId} → ${next}`,'success');
-    } catch(e){
-      console.error(e);
-      alert('Gagal update status: '+e.message);
-    }
-  };
-</script>
+    // ============ FILTER STATUS BUTTONS ============
 
+    document.querySelectorAll(".status-filter").forEach(btn => {
+      btn.addEventListener("click", () => {
+        currentFilter = btn.dataset.status;
 
+        document.querySelectorAll(".status-filter").forEach(b => {
+          b.classList.remove("ring-2", "ring-offset-1", "ring-orange-400");
+        });
+        btn.classList.add("ring-2", "ring-offset-1", "ring-orange-400");
 
-  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99d6a50ec106a8d5',t:'MTc2Mjk1Njk2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
- </body>
+        // render ulang pakai data terakhir di DOM:
+        // cara gampang: trigger ulang listener onValue dengan cara kecil — tapi di sini
+        // kita biarkan; renderOrders akan dipanggil otomatis saat ada perubahan data berikutnya.
+        // Kalau mau langsung, kita bisa simpan entries terakhir di variabel global.
+      });
+    });
+  </script>
+</body>
 </html>

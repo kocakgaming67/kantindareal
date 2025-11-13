@@ -394,7 +394,9 @@
     menuGrid.innerHTML = filteredItems.map(item => {
       const selectedVariant = selectedVariants[item.id];
       const variantName = selectedVariant ? selectedVariant.name : (item.hasVariants ? item.variants[0].name : null);
-      const cartItem = cart.find(c => c.id === item.id && c.variant === variantName);
+      const cartItem = cart.find(
+  c => c.id === item.id && (c.variant || '') === (variantName || '')
+);
       const quantity = cartItem ? cartItem.quantity : 0;
       const displayImage = selectedVariant ? selectedVariant.image : item.image;
       const displayPrice = selectedVariant ? selectedVariant.price : item.price;
@@ -470,24 +472,58 @@
 
   // ===================== CART FUNCTIONS =====================
   function addToCart(itemId) {
-    const item = menuItems.find(m => m.id === itemId);
-    const selectedVariant = selectedVariants[itemId];
-    const variantName = selectedVariant ? selectedVariant.name : (item.hasVariants ? item.variants[0].name : null);
+  const item = menuItems.find(m => m.id === itemId);
+  const selectedVariant = selectedVariants[itemId];
+  const variantName = selectedVariant
+    ? selectedVariant.name
+    : (item.hasVariants ? item.variants[0].name : null);
 
-    const existing = cart.find(c => c.id === item.id && c.variant === variantName);
-    if (existing) existing.quantity++;
-    else cart.push({ id: item.id, name: item.name, price: selectedVariant ? selectedVariant.price : item.price, quantity: 1, variant: variantName });
+  const existing = cart.find(
+    c => c.id === item.id && (c.variant || '') === (variantName || '')
+  );
 
-    updateCart();
-    renderMenu();
+  if (existing) {
+    existing.quantity++;
+  } else {
+    cart.push({
+      id: item.id,
+      name: item.name,
+      price: selectedVariant ? selectedVariant.price : item.price,
+      quantity: 1,
+      variant: variantName || ''   // standar: kalau nggak ada varian, simpan '' saja
+    });
   }
+
+  updateCart();
+  renderMenu();
+}
+
 
   function increaseQuantity(itemId, variantName) {
-    const item = cart.find(c => c.id === itemId && c.variant === variantName);
-    if (item) item.quantity++;
-    updateCart();
-    renderMenu();
+  const item = cart.find(
+    c => c.id === itemId && (c.variant || '') === (variantName || '')
+  );
+  if (item) item.quantity++;
+  updateCart();
+  renderMenu();
+}
+
+function decreaseQuantity(itemId, variantName) {
+  const item = cart.find(
+    c => c.id === itemId && (c.variant || '') === (variantName || '')
+  );
+  if (!item) return;
+
+  item.quantity--;
+  if (item.quantity <= 0) {
+    cart = cart.filter(
+      c => !(c.id === itemId && (c.variant || '') === (variantName || ''))
+    );
   }
+  updateCart();
+  renderMenu();
+}
+
 
   function decreaseQuantity(itemId, variantName) {
     const item = cart.find(c => c.id === itemId && c.variant === variantName);
@@ -561,174 +597,198 @@
 
   window.addEventListener('load', () => { renderMenu(); typeWriter(); });
 </script>
-<!-- ==== FIREBASE SDK + BACKEND LOGIC ==== -->
+<!-- ==== FIREBASE SDK + BACKEND LOGIC (PROJECT KANTIN-SEKOLAH-E6AEA) ==== -->
 <script type="module">
-  // --- Import Firebase v12 (CDN, modular) ---
+  // Import Firebase v12 (modular, dari CDN)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
   import {
-    getFirestore, collection, doc, getDoc, addDoc, serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+    getDatabase,
+    ref,
+    push,
+    get
+  } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
 
-  // --- Config proyekmu (ambil dari Firebase console) ---
+  // CONFIG PROJECT KAMU (kantin-sekolah-e6aea)
   const firebaseConfig = {
-    apiKey: "AIzaSyDL0SlYn5sTMfs_r68-lYIAcd9C7todxdI",
-    authDomain: "kantin-c5053.firebaseapp.com",
-    projectId: "kantin-c5053",
-    storageBucket: "kantin-c5053.firebasestorage.app",
-    messagingSenderId: "838998866961",
-    appId: "1:838998866961:web:8ca40fc9cf359ec9a045b0"
+    apiKey: "AIzaSyCkejTcOfPpedhrOx4gI4HVrejIM3G7cRg",
+    authDomain: "kantin-sekolah-e6aea.firebaseapp.com",
+    projectId: "kantin-sekolah-e6aea",
+    storageBucket: "kantin-sekolah-e6aea.firebasestorage.app",
+    messagingSenderId: "296536339754",
+    appId: "1:296536339754:web:05fac7daec8b65dd211a53",
+    databaseURL: "https://kantin-sekolah-e6aea-default-rtdb.asia-southeast1.firebasedatabase.app"
   };
 
-  // --- Init Firebase ---
+  // Init Firebase
   const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+  const db  = getDatabase(app);
 
-  // --- Anonymous auth untuk semua pengunjung ---
-  await signInAnonymously(auth).catch(console.error);
-  console.log("🔥 Firebase siap", { uid: auth.currentUser?.uid });
+  console.log("✅ Terhubung ke Firebase kantin-sekolah-e6aea");
 
-  // --- Ekspos supaya bisa diakses dari script non-module (onclick, dll) ---
-  window.fb = { app, auth, db, fs: { collection, doc, getDoc, addDoc, serverTimestamp } };
+  // ======================================================
+  //  SUBMIT ORDER  (dipanggil dari form: onsubmit="submitOrder(event)")
+  // ======================================================
+ window.submitOrder = async function submitOrder(event) {
+  event.preventDefault();
 
-  // ===================== SUBMIT ORDER (SIMPAN KE FIRESTORE) =====================
-  window.submitOrder = async function submitOrder(event) {
-    event.preventDefault();
+  const customerName  = document.getElementById('customerName').value.trim();
+  const customerClass = document.getElementById('customerClass').value.trim();
+  const customerNotes = document.getElementById('customerNotes').value.trim();
 
-    const { db, auth, fs } = window.fb;
-    const { addDoc, collection, serverTimestamp } = fs;
+  if (!customerName || !customerClass) {
+    alert("Nama dan kelas wajib diisi.");
+    return;
+  }
 
-    // Ambil data dari form
-    const customerName  = document.getElementById('customerName').value.trim();
-    const customerClass = document.getElementById('customerClass').value.trim();
-    const customerNotes = document.getElementById('customerNotes').value.trim();
+  if (!Array.isArray(cart) || cart.length === 0) {
+    alert("Keranjang masih kosong.");
+    return;
+  }
 
-    if (!customerName || !customerClass) return;
-    if (!Array.isArray(cart) || cart.length === 0) return;
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-    // Bentuk object order
-    const order = {
-      customerName,
-      customerClass,
-      notes: customerNotes,
-      items: cart.map(it => ({
-        id: it.id,
-        name: it.name,
-        variant: it.variant ?? null,
-        price: it.price,
-        quantity: it.quantity
-      })),
-      total: cart.reduce((sum, it) => sum + it.price * it.quantity, 0),
-      status: 'pending',
-      customerUid: auth.currentUser?.uid || null,
-      createdAt: serverTimestamp(),
-      publicLookup: true
-    };
-
-    // Simpan ke collection "orders" (auto-ID)
-    const ref = await addDoc(collection(db, 'orders'), order);
-    const orderId = ref.id;
-
-    // Tampilkan UI sukses (pakai modal kamu)
-    const modal = document.getElementById('checkoutModal');
-    modal.innerHTML = `
-      <div class="p-8 text-center">
-        <h2 class="text-2xl font-bold text-gray-800 mb-2">Pesanan Berhasil!</h2>
-        <p class="text-gray-600 mb-4">Nomor pesanan kamu:</p>
-        <div class="bg-orange-50 border-2 border-orange-500 rounded-xl p-4 mb-6">
-          <p class="text-2xl font-bold text-orange-600">${orderId}</p>
-        </div>
-        <p class="text-sm text-gray-600 mb-6">Simpan nomor ini untuk cek status pesanan</p>
-        <button onclick="finishOrder()" class="bg-gradient-to-r from-orange-500 to-yellow-500 text-white px-8 py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-yellow-600 transition-all shadow-lg">
-          Selesai
-        </button>
-      </div>
-    `;
+  const orderData = {
+    customerName,
+    customerClass,
+    notes: customerNotes || null,
+    items: cart.map(it => ({
+      id: it.id,
+      name: it.name,
+      variant: it.variant || null,
+      price: it.price,
+      quantity: it.quantity
+    })),
+    total,
+    status: "pending",
+    createdAt: Date.now()
   };
 
-  // ===================== CHECK ORDER (AMBIL DARI FIRESTORE) =====================
+  try {
+    const ordersRef   = ref(db, "orders");
+    const newOrderRef = await push(ordersRef, orderData);
+    const orderId     = newOrderRef.key;
+
+    // ❗ Jangan ubah HTML modal lagi, cukup pakai alert + reset
+    alert(
+      "Pesanan berhasil dibuat!\n\n" +
+      "Nomor pesanan kamu:\n" + orderId + "\n\n" +
+      "Simpan nomor ini untuk cek status pesanan di menu 'Cek Pesanan'."
+    );
+
+    // Bersihkan dan balik ke landing
+    finishOrder();
+
+  } catch (err) {
+    console.error("Gagal menyimpan pesanan:", err);
+    alert("Terjadi kesalahan saat menyimpan pesanan. Coba lagi ya.");
+  }
+};
+
+
+  // ======================================================
+  //  CHECK ORDER  (dipanggil dari tombol: onclick="checkOrder()")
+  // ======================================================
   window.checkOrder = async function checkOrder() {
     const orderId = document.getElementById('orderIdInput').value.trim();
-    if (!orderId) return;
+    const resultBox   = document.getElementById('orderResult');
+    const notFoundBox = document.getElementById('orderNotFound');
 
-    const { db, fs } = window.fb;
-    const { doc, getDoc } = fs;
-
-    const ref  = doc(db, 'orders', orderId);
-    const snap = await getDoc(ref);
-
-    if (!snap.exists()) {
-      document.getElementById('orderResult').classList.add('hidden');
-      document.getElementById('orderNotFound').classList.remove('hidden');
+    if (!orderId) {
+      alert("Masukkan nomor pesanan terlebih dahulu.");
       return;
     }
 
-    const order = snap.data();
+    try {
+      const orderRef  = ref(db, 'orders/' + orderId);
+      const snapshot  = await get(orderRef);
 
-    document.getElementById('orderNotFound').classList.add('hidden');
-    document.getElementById('orderResult').classList.remove('hidden');
+      if (!snapshot.exists()) {
+        // Pesanan tidak ditemukan
+        resultBox.classList.add('hidden');
+        notFoundBox.classList.remove('hidden');
+        return;
+      }
 
-    document.getElementById('resultOrderId').textContent = `#${orderId}`;
-    document.getElementById('resultName').textContent    = order.customerName;
-    document.getElementById('resultClass').textContent   = order.customerClass;
+      const order = snapshot.val();
 
-    const when = order.createdAt?.toDate ? order.createdAt.toDate() : new Date();
-    document.getElementById('resultTime').textContent    = when.toLocaleString('id-ID');
+      notFoundBox.classList.add('hidden');
+      resultBox.classList.remove('hidden');
 
-    // Items
-    document.getElementById('resultItems').innerHTML = (order.items || []).map(item => `
-      <div class="flex justify-between items-center bg-gray-50 rounded-lg p-3">
-        <span class="text-gray-700">
-          ${item.name}${item.variant ? ` (${item.variant})` : ''} x${item.quantity}
-        </span>
-        <span class="font-semibold text-gray-800">${formatCurrency(item.price * item.quantity)}</span>
-      </div>
-    `).join('');
+      // Isi data di UI
+      document.getElementById('resultOrderId').textContent = `#${orderId}`;
+      document.getElementById('resultName').textContent    = order.customerName || '-';
+      document.getElementById('resultClass').textContent   = order.customerClass || '-';
 
-    // Notes
-    if (order.notes) {
-      document.getElementById('resultNotesSection').classList.remove('hidden');
-      document.getElementById('resultNotes').textContent = order.notes;
-    } else {
-      document.getElementById('resultNotesSection').classList.add('hidden');
-    }
+      const when = order.createdAt ? new Date(order.createdAt) : new Date();
+      document.getElementById('resultTime').textContent = when.toLocaleString('id-ID');
 
-    // Total
-    document.getElementById('resultTotal').textContent = formatCurrency(order.total);
-
-    // Timeline status
-    const statusSteps = [
-      { status: 'pending',    label: 'Pesanan Diterima', icon: '1' },
-      { status: 'processing', label: 'Sedang Diproses',  icon: '2' },
-      { status: 'ready',      label: 'Siap Diambil',     icon: '3' },
-      { status: 'completed',  label: 'Selesai',          icon: '4' }
-    ];
-    const currentStatusIndex = statusSteps.findIndex(s => s.status === order.status);
-    document.getElementById('statusTimeline').innerHTML = statusSteps.map((step, i) => {
-      const isActive  = i <= currentStatusIndex;
-      const isCurrent = i === currentStatusIndex;
-      return `
-        <div class="relative flex items-start gap-4">
-          <div class="relative z-10 flex items-center justify-center w-8 h-8 rounded-full ${isActive ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-600'} ${isCurrent ? 'ring-4 ring-blue-200' : ''}">
-            <span class="text-sm font-bold">${step.icon}</span>
-          </div>
-          <div class="flex-1 ${isActive ? '' : 'opacity-50'}">
-            <p class="font-semibold text-gray-800">${step.label}</p>
-            ${isCurrent ? '<p class="text-sm text-blue-600 font-medium">Status saat ini</p>' : ''}
-          </div>
+      // List item pesanan
+      document.getElementById('resultItems').innerHTML = (order.items || []).map(item => `
+        <div class="flex justify-between items-center bg-gray-50 rounded-lg p-3">
+          <span class="text-gray-700">
+            ${item.name}${item.variant ? ` (${item.variant})` : ''} x${item.quantity}
+          </span>
+          <span class="font-semibold text-gray-800">${formatCurrency(item.price * item.quantity)}</span>
         </div>
-      `;
-    }).join('');
+      `).join('');
+
+      // Catatan
+      if (order.notes) {
+        document.getElementById('resultNotesSection').classList.remove('hidden');
+        document.getElementById('resultNotes').textContent = order.notes;
+      } else {
+        document.getElementById('resultNotesSection').classList.add('hidden');
+      }
+
+      // Total
+      document.getElementById('resultTotal').textContent = formatCurrency(order.total || 0);
+
+      // Timeline status
+      const statusSteps = [
+        { status: 'pending',    label: 'Pesanan Diterima', icon: '1' },
+        { status: 'processing', label: 'Sedang Diproses',  icon: '2' },
+        { status: 'ready',      label: 'Siap Diambil',     icon: '3' },
+        { status: 'completed',  label: 'Selesai',          icon: '4' }
+      ];
+
+      const currentStatusIndex = statusSteps.findIndex(s => s.status === order.status);
+      const timelineHTML = statusSteps.map((step, i) => {
+        const isActive  = currentStatusIndex === -1 ? i === 0 : i <= currentStatusIndex;
+        const isCurrent = currentStatusIndex === -1 ? i === 0 : i === currentStatusIndex;
+
+        return `
+          <div class="relative flex items-start gap-4">
+            <div class="relative z-10 flex items-center justify-center w-8 h-8 rounded-full ${
+              isActive ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-600'
+            } ${isCurrent ? 'ring-4 ring-blue-200' : ''}">
+              <span class="text-sm font-bold">${step.icon}</span>
+            </div>
+            <div class="flex-1 ${isActive ? '' : 'opacity-50'}">
+              <p class="font-semibold text-gray-800">${step.label}</p>
+              ${isCurrent ? '<p class="text-sm text-blue-600 font-medium">Status saat ini</p>' : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('statusTimeline').innerHTML = timelineHTML;
+
+    } catch (err) {
+      console.error("Gagal mengambil pesanan:", err);
+      alert("Terjadi kesalahan saat mengambil pesanan. Coba lagi.");
+    }
   };
 
-  // ===================== FINISH ORDER (BERSIHKAN KERANJANG) =====================
+  // ======================================================
+  //  FINISH ORDER (dipanggil tombol "Selesai" di modal)
+  // ======================================================
   window.finishOrder = function finishOrder() {
     cart = [];
     selectedVariants = {};
     updateCart();
     closeCheckoutModal();
     showLandingPage();
+
     const form = document.getElementById('checkoutForm');
     if (form) form.reset();
   };
