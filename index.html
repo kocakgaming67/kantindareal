@@ -135,7 +135,7 @@
     <main class="max-w-6xl mx-auto px-6 py-8">
       <!-- Search & Filter -->
       <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
-        <input type="text" id="searchInput" placeholder="Cari menu..." class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-all" oninput="filterMenu()">
+        <input type="text" id="searchInput" placeholder="Cari menu" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-all" oninput="filterMenu()">
         <div class="mt-4 flex flex-wrap">
           <span class="category-badge active bg-gradient-to-r from-orange-500 to-yellow-500 text-white" onclick="filterCategory('Semua')">Semua</span>
           <span class="category-badge bg-orange-100 text-orange-700" onclick="filterCategory('Snack')">Snack</span>
@@ -192,7 +192,7 @@
     required
     class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-all bg-white"
   >
-    <option value="" disabled selected>Pilih kelas kamu</option>
+    <option value="" disabled selected>Pilih kelas</option>
 
     <optgroup label="Kelas 10">
       <option value="10A">10A</option>
@@ -234,7 +234,7 @@
 
 
               <div>
-                <label for="customerNotes" class="block text-sm font-semibold text-gray-700 mb-2">Catatan (Opsional)</label>
+                <label for="customerNotes" class="block text-sm font-semibold text-gray-700 mb-2">Catatan</label>
                 <textarea id="customerNotes" rows="3" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-all" placeholder="Contoh: mie jangan diseduh"></textarea>
               </div>
               <div class="flex gap-3 pt-4">
@@ -305,7 +305,7 @@
 
           <div class="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-200">
             <div class="flex justify-between items-center">
-              <span class="font-bold text-gray-800">Total Pembayaran:</span>
+              <span class="font-bold text-gray-800">Total:</span>
               <span class="font-bold text-2xl text-blue-600" id="resultTotal"></span>
             </div>
           </div>
@@ -314,7 +314,7 @@
 
       <div id="orderNotFound" class="hidden mt-8 bg-white rounded-2xl shadow-xl p-8 text-center">
         <h3 class="text-xl font-bold text-gray-800 mb-2">Pesanan Tidak Ditemukan</h3>
-        <p class="text-gray-600">Periksa kembali nomor pesanan kamu</p>
+        <p class="text-gray-600">Periksa kembali nomor pesanan</p>
       </div>
     </main>
   </div>
@@ -764,7 +764,7 @@
   const app = initializeApp(firebaseConfig);
   const db  = getDatabase(app);
 
-  console.log("✅ Terhubung ke Firebase kantin-sekolah-e6aea");
+  console.log(" Terhubung ke Firebase kantin-sekolah-e6aea");
 
   // === LISTENER REALTIME UNTUK STATUS MENU (ON/OFF + VARIAN) ===
   const menuStatusRef = ref(db, "menuStatus");
@@ -824,9 +824,8 @@
       const orderId     = newOrderRef.key;
 
       alert(
-        "Pesanan berhasil dibuat!\n\n" +
-        "Nomor pesanan kamu:\n" + orderId + "\n\n" +
-        "Simpan nomor ini untuk cek status pesanan di menu 'Cek Pesanan'."
+        "Nomor pesanan:\n" + orderId + "\n\n" +
+        "Simpan nomor ini untuk cek status pesanan di menu Cek Pesanan"
       );
 
       // Reset & balik ke landing
@@ -834,7 +833,7 @@
 
     } catch (err) {
       console.error("Gagal menyimpan pesanan:", err);
-      alert("Terjadi kesalahan saat menyimpan pesanan. Coba lagi ya.");
+      alert("Terjadi kesalahan saat menyimpan pesanan");
     }
   };
 
@@ -948,4 +947,3 @@
 </script>
 
 <!-- ==== /FIREBASE SDK + BACKEND LOGIC ==== -->
-
