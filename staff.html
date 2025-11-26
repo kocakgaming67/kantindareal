@@ -6,44 +6,43 @@
   <title>Dashboard Staff Kantin</title>
   <script src="https://cdn.tailwindcss.com"></script>
 
- <style>
-  body { box-sizing: border-box; }
+  <style>
+    body { box-sizing: border-box; }
 
-  .status-pill {
-    border-radius: 9999px;
-    padding: 4px 10px;
-    font-size: 12px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-  }
+    .status-pill {
+      border-radius: 9999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
 
-  /* === ANIMASI BULAT2 SAMA SEPERTI index.html === */
-  @keyframes floatRotate1 {
-    0%   { transform: translate(0,0) rotate(0deg) scale(1); }
-    33%  { transform: translate(30px,-20px) rotate(120deg) scale(1.1); }
-    66%  { transform: translate(-20px,30px) rotate(240deg) scale(0.9); }
-    100% { transform: translate(0,0) rotate(360deg) scale(1); }
-  }
-  @keyframes floatRotate2 {
-    0%   { transform: translate(0,0) rotate(0deg) scale(1); }
-    33%  { transform: translate(-40px,25px) rotate(-120deg) scale(0.9); }
-    66%  { transform: translate(25px,-30px) rotate(-240deg) scale(1.15); }
-    100% { transform: translate(0,0) rotate(-360deg) scale(1); }
-  }
+    /* === ANIMASI BULAT2 SAMA SEPERTI index.html === */
+    @keyframes floatRotate1 {
+      0%   { transform: translate(0,0) rotate(0deg) scale(1); }
+      33%  { transform: translate(30px,-20px) rotate(120deg) scale(1.1); }
+      66%  { transform: translate(-20px,30px) rotate(240deg) scale(0.9); }
+      100% { transform: translate(0,0) rotate(360deg) scale(1); }
+    }
+    @keyframes floatRotate2 {
+      0%   { transform: translate(0,0) rotate(0deg) scale(1); }
+      33%  { transform: translate(-40px,25px) rotate(-120deg) scale(0.9); }
+      66%  { transform: translate(25px,-30px) rotate(-240deg) scale(1.15); }
+      100% { transform: translate(0,0) rotate(-360deg) scale(1); }
+    }
 
-  .animated-circle-1 {
-    animation: floatRotate1 5s ease-in-out infinite;
-  }
-  .animated-circle-2 {
-    animation: floatRotate2 6s ease-in-out infinite;
-  }
-</style>
-
+    .animated-circle-1 {
+      animation: floatRotate1 5s ease-in-out infinite;
+    }
+    .animated-circle-2 {
+      animation: floatRotate2 6s ease-in-out infinite;
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-slate-200 min-h-screen">
 
+<body class="bg-gradient-to-br from-slate-50 to-slate-200 min-h-screen">
   <!-- HEADER -->
   <header class="relative overflow-hidden bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-4 px-6 shadow-lg">
     <!-- bulat-bulat animasi -->
@@ -64,10 +63,10 @@
         </div>
       </div>
 
-      <!-- Kanan: tab + status + hamburger -->
+      <!-- Kanan: tab + status -->
       <div class="flex items-center gap-3">
-        <!-- NAV DESKTOP -->
-        <nav class="hidden md:flex items-center gap-2">
+        <!-- NAV -->
+        <nav class="flex items-center gap-2">
           <button
             data-section-btn="orders"
             class="px-4 py-2 rounded-full text-xs md:text-sm font-semibold bg-white text-orange-600 shadow-sm"
@@ -76,52 +75,22 @@
           </button>
           <button
             data-section-btn="menu"
-            class="px-4 py-2 rounded-full text-xs md:text-sm font-semibold bg-orange-400/40 hover:bg-orange-400/60 transition"
+            class="px-4 py-2 rounded-full text-xs md:text-sm font-semibold bg-white/20 text-white hover:bg-white/30 transition"
             onclick="showSection('menu')">
             Daftar Menu
           </button>
         </nav>
 
-        <!-- Badge koneksi (desktop) -->
+        <!-- Badge koneksi -->
         <span id="connectionStatus"
-              class="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/20 text-xs">
+              class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/20 text-xs">
           Menyambung...
         </span>
-
-        <!-- HAMBURGER MOBILE -->
-        <div class="md:hidden relative">
-          <button id="hamburgerBtn" class="p-2 rounded-md bg-white/20 hover:bg-white/30">
-            ☰
-          </button>
-          <div id="mobileMenu"
-               class="hidden absolute right-0 mt-2 w-44 bg-white text-gray-800 rounded-xl shadow-lg overflow-hidden z-50">
-            <button
-              data-section-btn="orders"
-              class="block w-full text-left px-4 py-2 text-sm hover:bg-orange-50"
-              onclick="showSection('orders'); toggleMobileMenu(false);">
-              Orderan
-            </button>
-            <button
-              data-section-btn="menu"
-              class="block w-full text-left px-4 py-2 text-sm hover:bg-orange-50"
-              onclick="showSection('menu'); toggleMobileMenu(false);">
-              Daftar Menu
-            </button>
-            <div class="border-t text-xs px-4 py-2 text-gray-500 flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-green-400"></span>
-              <span id="connectionStatusMobile">Online</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
-
   </header>
 
-
-
   <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
-
     <!-- ============= SECTION: ORDERAN ============= -->
     <section id="ordersSection" class="space-y-6">
       <!-- Filter Status -->
@@ -204,9 +173,36 @@
         </form>
       </section>
     </section>
-
   </main>
 
+  <!-- ========== MODAL KONFIRMASI GANTI STATUS ========== -->
+  <div
+    id="confirmModal"
+    class="hidden fixed inset-0 bg-black/40 z-50 items-center justify-center px-4"
+  >
+    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6">
+      <h2 class="text-lg font-bold text-gray-800 mb-2">Konfirmasi</h2>
+      <p id="confirmMessage" class="text-sm text-gray-600 mb-5">
+        Yakin ingin mengubah status pesanan ini?
+      </p>
+      <div class="flex flex-col sm:flex-row justify-end gap-3">
+        <button
+          id="confirmCancelBtn"
+          type="button"
+          class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-300"
+        >
+          Batal
+        </button>
+        <button
+          id="confirmOkBtn"
+          type="button"
+          class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-yellow-500 text-white text-sm font-semibold hover:from-orange-600 hover:to-yellow-600 shadow"
+        >
+          Ubah Status
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- ================= FIREBASE & LOGIC STAFF ================= -->
   <script type="module">
@@ -215,11 +211,9 @@
       getDatabase,
       ref,
       onValue,
-      get,
       update,
       set
     } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
-
 
     // CONFIG SAMA DENGAN index.html
     const firebaseConfig = {
@@ -295,14 +289,13 @@
 
     // ============ LISTENER menuStatus KHUSUS STAFF + RENDER PANEL ============
     const menuStatusRef = ref(db, "menuStatus");
-    window.menuStatus = window.menuStatus || {}; // global yang sama dipakai index.html
+    window.menuStatus = window.menuStatus || {};
 
     onValue(menuStatusRef, (snapshot) => {
       window.menuStatus = snapshot.val() || {};
       renderMenuStatusPanel();
     });
 
-    // ============ RENDER PANEL KELOLA MENU ============
     function renderMenuStatusPanel() {
       const container = document.getElementById("menuStatusList");
       if (!container) return;
@@ -368,29 +361,86 @@
       }).join("");
     }
 
-
     const ordersRef        = ref(db, "orders");
     const container        = document.getElementById("ordersContainer");
     const emptyState       = document.getElementById("emptyState");
     const connectionStatus = document.getElementById("connectionStatus");
-    const connectionStatusMobile = document.getElementById("connectionStatusMobile");
 
     const sumTotalEl      = document.getElementById("sumTotal");
     const sumPendingEl    = document.getElementById("sumPending");
     const sumProcessingEl = document.getElementById("sumProcessing");
     const sumReadyEl      = document.getElementById("sumReady");
 
-    // filter status yang sedang aktif di UI
-    let currentFilter   = "all";      // ✅ default: tampilkan SEMUA order
-    let latestEntries   = [];         // ✅ simpan data snapshot terakhir
+    // ===== Konfirmasi modal elements =====
+    const confirmModal      = document.getElementById("confirmModal");
+    const confirmMessageEl  = document.getElementById("confirmMessage");
+    const confirmCancelBtn  = document.getElementById("confirmCancelBtn");
+    const confirmOkBtn      = document.getElementById("confirmOkBtn");
 
-    // tandai filter tombol awal (Semua)
+    let pendingOrderId   = null;
+    let pendingNewStatus = null;
+
+    function openConfirmModal(message, orderId, newStatus) {
+      pendingOrderId   = orderId;
+      pendingNewStatus = newStatus;
+      if (confirmMessageEl) confirmMessageEl.textContent = message;
+
+      if (confirmModal) {
+        confirmModal.classList.remove("hidden");
+        confirmModal.classList.add("flex");
+      }
+    }
+
+    function closeConfirmModal() {
+      pendingOrderId   = null;
+      pendingNewStatus = null;
+      if (confirmModal) {
+        confirmModal.classList.add("hidden");
+        confirmModal.classList.remove("flex");
+      }
+    }
+
+    if (confirmCancelBtn) {
+      confirmCancelBtn.addEventListener("click", () => {
+        closeConfirmModal();
+      });
+    }
+
+    if (confirmOkBtn) {
+      confirmOkBtn.addEventListener("click", async () => {
+        if (!pendingOrderId || !pendingNewStatus) {
+          closeConfirmModal();
+          return;
+        }
+
+        const orderRef = ref(db, "orders/" + pendingOrderId);
+        try {
+          await update(orderRef, { status: pendingNewStatus });
+        } catch (err) {
+          console.error(err);
+          alert("Gagal mengubah status, coba lagi.");
+        }
+        closeConfirmModal();
+      });
+    }
+
+    if (confirmModal) {
+      confirmModal.addEventListener("click", (e) => {
+        if (e.target === confirmModal) {
+          closeConfirmModal();
+        }
+      });
+    }
+
+    // filter status yang sedang aktif di UI
+    let currentFilter   = "all";
+    let latestEntries   = [];
+
     document.querySelectorAll(".status-filter").forEach(btn => {
       if (btn.dataset.status === currentFilter) {
         btn.classList.add("ring-2", "ring-offset-1", "ring-orange-400");
       }
     });
-
 
     const STATUS_LABEL = {
       pending:    "Pending",
@@ -413,46 +463,32 @@
     }
 
     // ============ LISTENER REALTIME ============
-
     onValue(ordersRef, (snapshot) => {
       const data = snapshot.val() || {};
 
       connectionStatus.textContent = "Online";
       connectionStatus.className =
-        "hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold";
-
-      if (connectionStatusMobile) {
-        connectionStatusMobile.textContent = "Online";
-      }
+        "inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold";
 
       const entries = Object.entries(data).map(([id, order]) => ({
         id,
         ...order
       }));
 
-      // sort by createdAt terbaru
       entries.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
-      // ✅ simpan snapshot terakhir ke variabel global
       latestEntries = entries;
 
-      // render ringkasan & daftar berdasarkan filter aktif
       renderSummary(latestEntries);
       renderOrders(latestEntries);
     }, (error) => {
       console.error(error);
       connectionStatus.textContent = "Gagal terhubung";
       connectionStatus.className =
-        "hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold";
-
-      if (connectionStatusMobile) {
-        connectionStatusMobile.textContent = "Offline";
-      }
+        "inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold";
     });
 
-
     // ============ RENDER SUMMARY ============
-
     function renderSummary(entries) {
       if (!sumTotalEl) return;
 
@@ -469,7 +505,6 @@
     }
 
     // ============ RENDER ORDERS ============
-
     function renderOrders(entries) {
       const filtered = currentFilter === "all"
         ? entries
@@ -501,7 +536,6 @@
         const statusLabel = STATUS_LABEL[order.status] || order.status || "-";
         const statusClass = STATUS_CLASS[order.status] || "bg-gray-100 text-gray-700";
 
-        // tombol perubahan status
         const actionsHtml = `
           <div class="flex flex-wrap gap-2 mt-3">
             ${order.status !== "pending" ? "" : `
@@ -580,15 +614,13 @@
       }).join("");
     }
 
-    // ============ GANTI STATUS (event delegation) ============
-
+    // ============ GANTI STATUS (pakai modal, bukan confirm bawaan) ============
     container.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-action='set-status']");
       if (!btn) return;
 
       const id     = btn.dataset.id;
       const status = btn.dataset.status;
-
       if (!id || !status) return;
 
       const confTexts = {
@@ -599,17 +631,10 @@
       };
       const msg = confTexts[status] || "Ubah status pesanan?";
 
-      if (!confirm(msg)) return;
-
-      const orderRef = ref(db, "orders/" + id);
-      update(orderRef, { status }).catch(err => {
-        console.error(err);
-        alert("Gagal mengubah status, coba lagi.");
-      });
+      openConfirmModal(msg, id, status);
     });
 
     // ============ FILTER STATUS BUTTONS ============
-
     document.querySelectorAll(".status-filter").forEach(btn => {
       btn.addEventListener("click", () => {
         currentFilter = btn.dataset.status;
@@ -619,38 +644,36 @@
         });
         btn.classList.add("ring-2", "ring-offset-1", "ring-orange-400");
 
-        // ✅ langsung render ulang list pakai data terakhir
         renderOrders(latestEntries);
       });
     });
 
-    // ============ HANDLER KETIKA CHECKBOX DI STAFF DIUBAH ============
+    // ============ HANDLER CHECKBOX MENU / VARIAN (NYIMPEN KE DB) ============
     const menuStatusListEl = document.getElementById("menuStatusList");
 
     if (menuStatusListEl) {
       menuStatusListEl.addEventListener("change", async (event) => {
         const target = event.target;
 
-        // Matikan / nyalakan seluruh menu
+        // toggle satu menu (on/off semua varian)
         if (target.matches("[data-menu-toggle]")) {
-          const menuId = Number(target.getAttribute("data-menu-toggle"));
+          const menuId   = Number(target.getAttribute("data-menu-toggle"));
           const disabled = target.checked;
           await updateWholeMenuStatus(menuId, { disabled });
         }
 
-        // Matikan / nyalakan varian tertentu
+        // toggle varian tertentu
         if (target.matches("[data-variant-toggle]")) {
-          const menuId = Number(target.getAttribute("data-variant-toggle"));
+          const menuId      = Number(target.getAttribute("data-variant-toggle"));
           const variantName = target.getAttribute("data-variant-name");
-          const disabled = target.checked;
+          const disabled    = target.checked;
           await updateVariantStatus(menuId, variantName, disabled);
         }
       });
     }
 
-    // ====== FUNGSI UPDATE KE FIREBASE ======
     async function updateWholeMenuStatus(menuId, partial) {
-      const current = (window.menuStatus && window.menuStatus[menuId]) || {};
+      const current   = (window.menuStatus && window.menuStatus[menuId]) || {};
       const newStatus = { ...current, ...partial };
 
       const menuRef = ref(db, `menuStatus/${menuId}`);
@@ -663,7 +686,7 @@
     }
 
     async function updateVariantStatus(menuId, variantName, disabled) {
-      const current = (window.menuStatus && window.menuStatus[menuId]) || {};
+      const current          = (window.menuStatus && window.menuStatus[menuId]) || {};
       const disabledVariants = { ...(current.disabledVariants || {}) };
 
       if (disabled) {
@@ -673,7 +696,7 @@
       }
 
       const newStatus = { ...current, disabledVariants };
-      const menuRef = ref(db, `menuStatus/${menuId}`);
+      const menuRef   = ref(db, `menuStatus/${menuId}`);
 
       try {
         await set(menuRef, newStatus);
@@ -698,63 +721,18 @@
         menu.classList.add("hidden");
       }
 
-      // update style tombol (desktop + mobile)
       document.querySelectorAll("[data-section-btn]").forEach(btn => {
         const target   = btn.getAttribute("data-section-btn");
         const isActive = target === section;
 
-        if (btn.closest("#mobileMenu")) {
-          // tombol di dropdown mobile
-          btn.classList.toggle("bg-orange-50", isActive);
-          btn.classList.toggle("font-semibold", isActive);
+        const baseClasses = "px-4 py-2 rounded-full text-xs md:text-sm font-semibold";
+        if (isActive) {
+          btn.className = baseClasses + " bg-white text-orange-600 shadow-sm";
         } else {
-          // tombol di navbar desktop
-          const baseClasses = "px-4 py-2 rounded-full text-xs md:text-sm font-semibold";
-          if (isActive) {
-            btn.className = baseClasses + " bg-white text-orange-600 shadow-sm";
-          } else {
-            btn.className = baseClasses + " bg-orange-400/40 hover:bg-orange-400/60 transition text-white";
-          }
+          btn.className = baseClasses + " bg-white/20 text-white hover:bg-white/30 transition";
         }
       });
     };
-
-    // ========= HAMBURGER MOBILE =========
-    window.toggleMobileMenu = function toggleMobileMenu(force) {
-      const menu = document.getElementById("mobileMenu");
-      if (!menu) return;
-
-      const shouldShow =
-        typeof force === "boolean" ? force : menu.classList.contains("hidden");
-
-      if (shouldShow) {
-        menu.classList.remove("hidden");
-      } else {
-        menu.classList.add("hidden");
-      }
-    };
-
-    const hamburgerBtn = document.getElementById("hamburgerBtn");
-    if (hamburgerBtn) {
-      hamburgerBtn.addEventListener("click", () => {
-        toggleMobileMenu();
-      });
-    }
-
-    // klik di luar menu → tutup menu
-    document.addEventListener("click", (event) => {
-      const menu = document.getElementById("mobileMenu");
-      const btn  = document.getElementById("hamburgerBtn");
-      if (!menu || !btn) return;
-
-      if (
-        !menu.classList.contains("hidden") &&
-        !menu.contains(event.target) &&
-        !btn.contains(event.target)
-      ) {
-        menu.classList.add("hidden");
-      }
-    });
 
     // default: buka section orders
     showSection("orders");
