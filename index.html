@@ -71,49 +71,32 @@
         </div>
 
         <!-- Kartu Aksi -->
-        <div class="grid md:grid-cols-2 gap-6">
-          <!-- Pesan -->
-          <div class="bg-white rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition-all transform hover:-translate-y-1">
-            <div class="w-20 h-20 bg-gradient-to-br from-orange-400 to-yellow-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-12 h-12">
-                <ellipse cx="32" cy="20" rx="18" ry="6" fill="#f59e0b" opacity="0.9" />
-                <path d="M 14 20 Q 14 24 32 24 Q 50 24 50 20" fill="#fbbf24" />
-                <path d="M 16 26 L 48 26 L 46 30 L 18 30 Z" fill="#86efac" />
-                <path d="M 17 30 L 47 30 L 45 34 L 19 34 Z" fill="#fde047" />
-                <path d="M 18 34 L 46 34 L 44 40 L 20 40 Z" fill="#92400e" />
-                <ellipse cx="32" cy="42" rx="16" ry="5" fill="#f59e0b" />
-                <path d="M 16 42 Q 16 46 32 46 Q 48 46 48 42" fill="#fbbf24" />
-              </svg>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-800 mb-3">Pesan Menu</h3>
-            <p class="text-gray-600 mb-6">Pilih Menu</p>
-            <button onclick="showOrderPage()" class="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-4 rounded-xl font-semibold text-lg hover:from-orange-600 hover:to-yellow-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
-              Pesan Sekarang →
-            </button>
-          </div>
+<div class="grid md:grid-cols-2 gap-6">
+  <!-- Pesan -->
+  <div class="bg-white rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition-all transform hover:-translate-y-1">
+    <!-- ikon dihapus, ganti spacer saja -->
+    <div class="mb-6"></div>
 
-          <!-- Cek -->
-          <div class="bg-white rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition-all transform hover:-translate-y-1">
-            <div class="w-20 h-20 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-12 h-12">
-                <rect x="14" y="12" width="36" height="46" rx="3" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="2" />
-                <rect x="24" y="8" width="16" height="8" rx="2" fill="#0ea5e9" />
-                <rect x="26" y="10" width="12" height="6" rx="1" fill="#7dd3fc" />
-                <path d="M 20 24 L 23 27 L 28 22" stroke="#0ea5e9" stroke-width="2" fill="none" stroke-linecap="round" />
-                <line x1="32" y1="25" x2="44" y2="25" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" />
-                <path d="M 20 34 L 23 37 L 28 32" stroke="#0ea5e9" stroke-width="2" fill="none" stroke-linecap="round" />
-                <line x1="32" y1="35" x2="44" y2="35" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" />
-                <path d="M 20 44 L 23 47 L 28 42" stroke="#0ea5e9" stroke-width="2" fill="none" stroke-linecap="round" />
-                <line x1="32" y1="45" x2="44" y2="45" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" />
-              </svg>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-800 mb-3">Cek Pesanan</h3>
-            <p class="text-gray-600 mb-6">Cek status</p>
-            <button onclick="showCheckPage()" class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-4 rounded-xl font-semibold text-lg hover:from-blue-600 hover:to-cyan-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
-              Cek Status →
-            </button>
-          </div>
-        </div>
+    <h3 class="text-2xl font-bold text-gray-800 mb-3">Pesan Menu</h3>
+    <p class="text-gray-600 mb-6">Pilih Menu</p>
+    <button onclick="showOrderPage()" class="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-4 rounded-xl font-semibold text-lg hover:from-orange-600 hover:to-yellow-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
+      Pesan Sekarang →
+    </button>
+  </div>
+
+  <!-- Cek -->
+  <div class="bg-white rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition-all transform hover:-translate-y-1">
+    <!-- ikon dihapus, ganti spacer saja -->
+    <div class="mb-6"></div>
+
+    <h3 class="text-2xl font-bold text-gray-800 mb-3">Cek Pesanan</h3>
+    <p class="text-gray-600 mb-6">Cek status</p>
+    <button onclick="showCheckPage()" class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-4 rounded-xl font-semibold text-lg hover:from-blue-600 hover:to-cyan-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
+      Cek Status →
+    </button>
+  </div>
+</div>
+
       </div>
     </main>
 
@@ -248,47 +231,57 @@
     </main>
   </div>
   <!-- Modal Nomor Pesanan -->
-  <div id="orderIdModal"
-       class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-6">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-      <h2 class="text-xl font-bold text-gray-800 mb-2">Pesanan Berhasil Dibuat</h2>
-      <p class="text-sm text-gray-600 mb-4">
-        Simpan nomor pesanan di bawah ini untuk cek status di menu
-        <span class="font-semibold">Cek Pesanan</span>.
-      </p>
+<div
+  id="orderIdModal"
+  class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4 sm:px-6"
+>
+  <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+    <h2 class="text-xl font-bold text-gray-800 mb-2">Pesanan Berhasil Dibuat</h2>
+    <p class="text-sm text-gray-600 mb-4">
+      Simpan nomor pesanan di bawah ini untuk cek status di menu
+      <span class="font-semibold">Cek Pesanan</span>.
+    </p>
 
-      <div class="bg-gray-100 rounded-xl px-4 py-3 flex items-center justify-between gap-2 mb-3">
-        <span id="orderIdDisplay"
-              class="font-mono text-xs sm:text-sm text-gray-800 break-all"></span>
-        <button type="button"
-                onclick="copyOrderId()"
-                class="shrink-0 text-xs sm:text-sm font-semibold px-3 py-1 rounded-lg
-                       bg-gradient-to-r from-blue-500 to-cyan-500 text-white
-                       hover:from-blue-600 hover:to-cyan-600">
-          Salin
-        </button>
-      </div>
+    <div class="bg-gray-100 rounded-xl px-4 py-3 flex items-center justify-between gap-2 mb-3">
+      <span
+        id="orderIdDisplay"
+        class="font-mono text-xs sm:text-sm text-gray-800 break-all"
+      ></span>
+      <button
+        type="button"
+        onclick="copyOrderId()"
+        class="shrink-0 text-xs sm:text-sm font-semibold px-3 py-1 rounded-lg
+               bg-gradient-to-r from-blue-500 to-cyan-500 text-white
+               hover:from-blue-600 hover:to-cyan-600"
+      >
+        Salin
+      </button>
+    </div>
 
-      <div id="copyStatus" class="text-xs text-green-600 mb-4 hidden">
-        Nomor pesanan sudah disalin.
-      </div>
+    <div id="copyStatus" class="text-xs text-green-600 mb-4 hidden">
+      Nomor pesanan sudah disalin.
+    </div>
 
-      <div class="flex flex-col sm:flex-row gap-3">
-        <button type="button"
-                onclick="closeOrderIdModal()"
-                class="flex-1 py-2 rounded-xl font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300">
-          Tutup
-        </button>
-        <button type="button"
-                onclick="goToCheckPageWithOrder()"
-                class="flex-1 py-2 rounded-xl font-semibold
-                       bg-gradient-to-r from-blue-500 to-cyan-500 text-white
-                       hover:from-blue-600 hover:to-cyan-600">
-          Cek Status Pesanan
-        </button>
-      </div>
+    <div class="flex flex-col sm:flex-row gap-3">
+      <button
+        type="button"
+        onclick="closeOrderIdModal()"
+        class="flex-1 py-2 rounded-xl font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300"
+      >
+        Tutup
+      </button>
+      <button
+        type="button"
+        onclick="goToCheckPageWithOrder()"
+        class="flex-1 py-2 rounded-xl font-semibold
+               bg-gradient-to-r from-blue-500 to-cyan-500 text-white
+               hover:from-blue-600 hover:to-cyan-600"
+      >
+        Cek Status Pesanan
+      </button>
     </div>
   </div>
+</div>
 
   <!-- Check Order Page -->
   <div id="checkPage" class="hidden min-h-screen">
@@ -329,15 +322,14 @@
           <h2 class="text-xl font-bold">Detail Pesanan</h2>
           <p class="text-sm opacity-90" id="resultOrderId"></p>
         </div>
-        <div class="p-6">
-          <div class="mb-6">
-            <h3 class="font-semibold text-gray-800 mb-3">Informasi Pemesan:</h3>
-            <div class="bg-gray-50 rounded-xl p-4 space-y-2">
-              <p class="text-sm"><span class="font-semibold">Nama:</span> <span id="resultName"></span></p>
-              <p class="text-sm"><span class="font-semibold">Kelas:</span> <span id="resultClass"></span></p>
-              <p class="text-sm"><span class="font-semibold">Waktu Pesan:</span> <span id="resultTime"></span></p>
-            </div>
-          </div>
+        <div class="mb-6">
+  <h3 class="font-semibold text-gray-800 mb-3">Informasi Pemesan:</h3>
+  <div class="bg-gray-50 rounded-xl p-4 space-y-2">
+    <p class="text-sm"><span class="font-semibold">Kelas:</span> <span id="resultClass"></span></p>
+    <p class="text-sm"><span class="font-semibold">Waktu Pesan:</span> <span id="resultTime"></span></p>
+  </div>
+</div>
+
 
           <div class="mb-6">
             <h3 class="font-semibold text-gray-800 mb-3">Pesanan:</h3>
@@ -1015,42 +1007,41 @@ function copyOrderNumber() {
 
   };
 
-  // ======================================================
-  //  CHECK ORDER  (dipanggil dari tombol: onclick="checkOrder()")
-  // ======================================================
-  window.checkOrder = async function checkOrder() {
-    const orderId = document.getElementById('orderIdInput').value.trim();
-    const resultBox   = document.getElementById('orderResult');
-    const notFoundBox = document.getElementById('orderNotFound');
+// ======================================================
+//  CHECK ORDER  (dipanggil dari tombol: onclick="checkOrder()")
+// ======================================================
+window.checkOrder = async function checkOrder() {
+  const orderId = document.getElementById('orderIdInput').value.trim();
+  const resultBox   = document.getElementById('orderResult');
+  const notFoundBox = document.getElementById('orderNotFound');
 
-    if (!orderId) {
-      alert("Masukkan nomor pesanan terlebih dahulu.");
+  if (!orderId) {
+    alert("Masukkan nomor pesanan terlebih dahulu.");
+    return;
+  }
+
+  try {
+    const orderRef  = ref(db, 'orders/' + orderId);
+    const snapshot  = await get(orderRef);
+
+    if (!snapshot.exists()) {
+      // Pesanan tidak ditemukan
+      resultBox.classList.add('hidden');
+      notFoundBox.classList.remove('hidden');
       return;
     }
 
-    try {
-      const orderRef  = ref(db, 'orders/' + orderId);
-      const snapshot  = await get(orderRef);
+    const order = snapshot.val();
 
-      if (!snapshot.exists()) {
-        // Pesanan tidak ditemukan
-        resultBox.classList.add('hidden');
-        notFoundBox.classList.remove('hidden');
-        return;
-      }
+    notFoundBox.classList.add('hidden');
+    resultBox.classList.remove('hidden');
 
-      const order = snapshot.val();
+    // Isi data di UI
+    document.getElementById('resultOrderId').textContent = `#${orderId}`;
+    document.getElementById('resultClass').textContent   = order.customerClass || '-';
 
-      notFoundBox.classList.add('hidden');
-      resultBox.classList.remove('hidden');
-
-      // Isi data di UI
-      document.getElementById('resultOrderId').textContent = `#${orderId}`;
-      document.getElementById('resultName').textContent    = order.customerName || '-';
-      document.getElementById('resultClass').textContent   = order.customerClass || '-';
-
-      const when = order.createdAt ? new Date(order.createdAt) : new Date();
-      document.getElementById('resultTime').textContent = when.toLocaleString('id-ID');
+    const when = order.createdAt ? new Date(order.createdAt) : new Date();
+    document.getElementById('resultTime').textContent = when.toLocaleString('id-ID');
 
       // List item pesanan
       document.getElementById('resultItems').innerHTML = (order.items || []).map(item => `
