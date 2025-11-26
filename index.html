@@ -157,7 +157,7 @@
               <p class="text-xs text-gray-500" id="cartItems">0 item</p>
             </div>
             <button onclick="showCheckoutForm()" class="bg-gradient-to-r from-orange-500 to-yellow-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-orange-600 hover:to-yellow-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
-              Pesan
+              Lanjut Pesan →
             </button>
           </div>
         </div>
@@ -172,7 +172,7 @@
           <div class="p-6">
             <!-- Order Summary -->
             <div class="bg-orange-50 rounded-xl p-4 mb-6">
-              <h3 class="font-semibold text-gray-800 mb-3">Informasi Pesanan:</h3>
+              <h3 class="font-semibold text-gray-800 mb-3">Ringkasan Pesanan:</h3>
               <div id="orderSummaryList" class="space-y-2 text-sm"></div>
               <div class="border-t-2 border-orange-200 mt-3 pt-3">
                 <div class="flex justify-between items-center">
@@ -239,13 +239,55 @@
               </div>
               <div class="flex gap-3 pt-4">
                 <button type="button" onclick="closeCheckoutModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-300 transition-all">Batal</button>
-                <button type="submit" class="flex-1 bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-yellow-600 transition-all shadow-lg">Konfirmasi</button>
+                <button type="submit" class="flex-1 bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-yellow-600 transition-all shadow-lg">Konfirmasi Pesanan</button>
               </div>
             </form>
           </div>
         </div>
       </div>
     </main>
+  </div>
+  <!-- Modal Nomor Pesanan -->
+  <div id="orderIdModal"
+       class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-6">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+      <h2 class="text-xl font-bold text-gray-800 mb-2">Pesanan Berhasil Dibuat</h2>
+      <p class="text-sm text-gray-600 mb-4">
+        Simpan nomor pesanan di bawah ini untuk cek status di menu
+        <span class="font-semibold">Cek Pesanan</span>.
+      </p>
+
+      <div class="bg-gray-100 rounded-xl px-4 py-3 flex items-center justify-between gap-2 mb-3">
+        <span id="orderIdDisplay"
+              class="font-mono text-xs sm:text-sm text-gray-800 break-all"></span>
+        <button type="button"
+                onclick="copyOrderId()"
+                class="shrink-0 text-xs sm:text-sm font-semibold px-3 py-1 rounded-lg
+                       bg-gradient-to-r from-blue-500 to-cyan-500 text-white
+                       hover:from-blue-600 hover:to-cyan-600">
+          Salin
+        </button>
+      </div>
+
+      <div id="copyStatus" class="text-xs text-green-600 mb-4 hidden">
+        Nomor pesanan sudah disalin.
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button type="button"
+                onclick="closeOrderIdModal()"
+                class="flex-1 py-2 rounded-xl font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300">
+          Tutup
+        </button>
+        <button type="button"
+                onclick="goToCheckPageWithOrder()"
+                class="flex-1 py-2 rounded-xl font-semibold
+                       bg-gradient-to-r from-blue-500 to-cyan-500 text-white
+                       hover:from-blue-600 hover:to-cyan-600">
+          Cek Status Pesanan
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Check Order Page -->
@@ -422,6 +464,8 @@
   let cart = [];
   let currentFilter = 'Semua';
   let selectedVariants = {};
+  let lastOrderId = null; // simpan nomor pesanan terakhir untuk modal & copy
+
 
   function formatCurrency(amount) {
     return 'Rp ' + amount.toLocaleString('id-ID');
@@ -735,9 +779,128 @@
     type();
   }
 
+    // ===================== MODAL NOMOR PESANAN =====================
+  function showOrderIdModal(orderId) {
+    lastOrderId = orderId;
+
+    const modal     = document.getElementById('orderIdModal');
+    const textEl    = document.getElementById('orderIdDisplay');
+    const copyState = document.getElementById('copyStatus');
+
+    if (textEl) textEl.textContent = orderId;
+    if (copyState) copyState.classList.add('hidden');
+    if (modal) modal.classList.remove('hidden');
+  }
+
+  function closeOrderIdModal() {
+    const modal = document.getElementById('orderIdModal');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  // salin nomor pesanan ke clipboard
+  function copyOrderId() {
+    if (!lastOrderId) return;
+
+    const copyState = document.getElementById('copyStatus');
+
+    function showCopied() {
+      if (!copyState) return;
+      copyState.textContent = 'Nomor pesanan sudah disalin.';
+      copyState.classList.remove('hidden');
+      setTimeout(() => copyState.classList.add('hidden'), 2000);
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(lastOrderId)
+        .then(showCopied)
+        .catch(showCopied);
+    } else {
+      // fallback lama
+      const temp = document.createElement('textarea');
+      temp.value = lastOrderId;
+      temp.style.position = 'fixed';
+      temp.style.opacity = '0';
+      document.body.appendChild(temp);
+      temp.focus();
+      temp.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(temp);
+      showCopied();
+    }
+  }
+
+  // buka halaman cek + otomatis isi input nomor pesanan
+  function goToCheckPageWithOrder() {
+    if (!lastOrderId) return;
+
+    showCheckPage(); // fungsi yang sudah ada
+
+    const input = document.getElementById('orderIdInput');
+    if (input) {
+      input.value = lastOrderId;
+      input.focus();
+      input.select();
+    }
+
+    closeOrderIdModal();
+  }
+
   window.addEventListener('load', () => { renderMenu(); typeWriter(); });
+
 </script>
 <!-- ==== FIREBASE SDK + BACKEND LOGIC (PROJECT KANTIN-SEKOLAH-E6AEA) ==== -->
+<!-- Popup CSS -->
+<style>
+.popup-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.popup-box {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 300px;
+    text-align: center;
+    font-family: Arial;
+}
+</style>
+
+<!-- Popup HTML -->
+<div class="popup-container" id="orderPopup">
+  <div class="popup-box">
+    <h3>Order berhasil!</h3>
+    <p>Total: <span id="popupTotal"></span></p>
+    <p>Order Number: <span id="popupOrderNum"></span></p>
+    <button onclick="copyOrderNumber()">Copy</button>
+    <button onclick="closePopup()">Close</button>
+  </div>
+</div>
+
+<script>
+function showPopup(total, orderNum) {
+    document.getElementById("popupTotal").innerText = total;
+    document.getElementById("popupOrderNum").innerText = orderNum;
+    document.getElementById("orderPopup").style.display = "flex";
+}
+
+function closePopup() {
+    document.getElementById("orderPopup").style.display = "none";
+}
+
+function copyOrderNumber() {
+    navigator.clipboard.writeText(document.getElementById("popupOrderNum").innerText);
+}
+</script>
+
 <script type="module">
   // Import Firebase v12 (modular, dari CDN)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
@@ -819,22 +982,23 @@
     };
 
     try {
-      const ordersRef   = ref(db, "orders");
-      const newOrderRef = await push(ordersRef, orderData);
-      const orderId     = newOrderRef.key;
+  const ordersRef   = ref(db, "orders");
+  const newOrderRef = await push(ordersRef, orderData);
+  const orderId     = newOrderRef.key;
 
-      alert(
-        "Nomor pesanan:\n" + orderId + "\n\n" +
-        "Simpan nomor ini untuk cek status pesanan di menu Cek Pesanan"
-      );
+  // Reset tampilan (tutup modal checkout, kosongkan keranjang, kembali ke landing)
+  finishOrder();
 
-      // Reset & balik ke landing
-      finishOrder();
+  // Tampilkan modal khusus nomor pesanan
+  if (window.showOrderIdModal) {
+    window.showOrderIdModal(orderId);
+  }
 
-    } catch (err) {
-      console.error("Gagal menyimpan pesanan:", err);
-      alert("Terjadi kesalahan saat menyimpan pesanan");
-    }
+} catch (err) {
+  console.error("Gagal menyimpan pesanan:", err);
+  alert("Terjadi kesalahan saat menyimpan pesanan");
+}
+
   };
 
   // ======================================================
@@ -945,6 +1109,3 @@
     if (form) form.reset();
   };
 </script>
-
-<!-- ==== /FIREBASE SDK + BACKEND LOGIC ==== -->
-
