@@ -1,1116 +1,1798 @@
+
 <!doctype html>
+
 <html lang="id">
+
 <head>
+
   <meta charset="UTF-8" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>E-Kantin</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
+
     body { box-sizing: border-box; }
+
     .menu-card { transition: all 0.3s ease; }
+
     .menu-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+
     .menu-image { width: 100%; height: 180px; object-fit: cover; border-radius: 12px 12px 0 0; }
 
     .variant-popup { position: absolute; bottom: 100%; left: 0; right: 0; background: white; border-radius: 12px; box-shadow: 0 -4px 20px rgba(0,0,0,0.15); max-height: 250px; overflow-y: auto; z-index: 50; display: none; }
+
     .variant-popup.active { display: block; animation: slideUp 0.3s ease; }
 
     @keyframes slideUp { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);} }
 
     .category-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-right: 8px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
+
     .category-badge:hover { transform: scale(1.05); }
+
     .category-badge.active { box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 
     .cursor { animation: blink 0.7s infinite; font-weight: normal; }
+
     @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
 
     @keyframes floatRotate1 { 0% { transform: translate(0,0) rotate(0deg) scale(1);} 33% { transform: translate(30px,-20px) rotate(120deg) scale(1.1);} 66% { transform: translate(-20px,30px) rotate(240deg) scale(0.9);} 100% { transform: translate(0,0) rotate(360deg) scale(1);} }
+
     @keyframes floatRotate2 { 0% { transform: translate(0,0) rotate(0deg) scale(1);} 33% { transform: translate(-40px,25px) rotate(-120deg) scale(0.9);} 66% { transform: translate(25px,-30px) rotate(-240deg) scale(1.15);} 100% { transform: translate(0,0) rotate(-360deg) scale(1);} }
+
     .animated-circle-1 { animation: floatRotate1 5s ease-in-out infinite; }
+
     .animated-circle-2 { animation: floatRotate2 6s ease-in-out infinite; }
 
     .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+
     .pulse-animation { animation: pulse 2s infinite; }
+
     @keyframes pulse { 0%, 100% { opacity: 1;} 50% { opacity: 0.5;} }
+
   </style>
 
   <style>@view-transition { navigation: auto; }</style>
-  <!-- (abaikan dua baris SDK ini, bukan dari Firebase) -->
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
-  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+
+  <script src="/\_sdk/data_sdk.js" type="text/javascript"></script>
+
+  <script src="/\_sdk/element_sdk.js" type="text/javascript"></script>
+
 </head>
 
 <body class="bg-gradient-to-br from-orange-50 to-yellow-50 min-h-full">
-  <!-- Landing Page -->
+
   <div id="landingPage" class="min-h-screen flex flex-col">
+
     <header class="bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-6 px-6 shadow-lg">
+
       <div class="max-w-4xl mx-auto flex items-center gap-4">
+
         <img src="logo.png" alt="Logo E-Kantin" class="w-16 h-16 object-contain" onerror="this.style.display='none'">
+
         <div>
+
           <h1 class="text-3xl font-bold">E-Kantin</h1>
+
         </div>
+
       </div>
+
     </header>
 
     <main class="flex-1 flex items-center justify-center px-6 py-12">
+
       <div class="max-w-5xl w-full">
-        <!-- Welcome Hero -->
+
         <div class="bg-gradient-to-br from-orange-400 via-orange-500 to-yellow-500 rounded-3xl shadow-2xl p-12 mb-8 text-center relative overflow-hidden">
+
           <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 animated-circle-1"></div>
+
           <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24 animated-circle-2"></div>
+
           <div class="relative z-10">
+
             <div class="inline-block bg-white/20 backdrop-blur-sm rounded-2xl px-6 py-3 mb-6">
+
               <p class="text-white font-semibold text-lg">Selamat Datang!</p>
+
             </div>
+
             <h2 class="text-5xl font-bold text-white mb-4 drop-shadow-lg">Kantin Digital</h2>
+
             <p class="text-white/90 text-xl mb-2">Mulai Order!</p>
+
             <p class="text-white/80 text-2xl max-w-2xl mx-auto font-semibold">
+
               <span id="typingText"></span><span id="cursor" class="cursor">|</span>
+
             </p>
+
           </div>
+
         </div>
 
-        <!-- Kartu Aksi -->
-<div class="grid md:grid-cols-2 gap-6">
-  <!-- Pesan -->
-  <div class="bg-white rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition-all transform hover:-translate-y-1">
-    <!-- ikon dihapus, ganti spacer saja -->
-    <div class="mb-6"></div>
+        <div class="grid md:grid-cols-2 gap-6">
 
-    <h3 class="text-2xl font-bold text-gray-800 mb-3">Pesan Menu</h3>
-    <p class="text-gray-600 mb-6">Pilih Menu</p>
-    <button onclick="showOrderPage()" class="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-4 rounded-xl font-semibold text-lg hover:from-orange-600 hover:to-yellow-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
-      Pesan Sekarang →
-    </button>
-  </div>
+          <div class="bg-white rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition-all transform hover:-translate-y-1">
 
-  <!-- Cek -->
-  <div class="bg-white rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition-all transform hover:-translate-y-1">
-    <!-- ikon dihapus, ganti spacer saja -->
-    <div class="mb-6"></div>
+            <div class="w-20 h-20 bg-gradient-to-br from-orange-400 to-yellow-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
 
-    <h3 class="text-2xl font-bold text-gray-800 mb-3">Cek Pesanan</h3>
-    <p class="text-gray-600 mb-6">Cek status</p>
-    <button onclick="showCheckPage()" class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-4 rounded-xl font-semibold text-lg hover:from-blue-600 hover:to-cyan-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
-      Cek Status →
-    </button>
-  </div>
-</div>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-12 h-12">
+
+                <ellipse cx="32" cy="20" rx="18" ry="6" fill="#f59e0b" opacity="0.9" />
+
+                <path d="M 14 20 Q 14 24 32 24 Q 50 24 50 20" fill="#fbbf24" />
+
+                <path d="M 16 26 L 48 26 L 46 30 L 18 30 Z" fill="#86efac" />
+
+                <path d="M 17 30 L 47 30 L 45 34 L 19 34 Z" fill="#fde047" />
+
+                <path d="M 18 34 L 46 34 L 44 40 L 20 40 Z" fill="#92400e" />
+
+                <ellipse cx="32" cy="42" rx="16" ry="5" fill="#f59e0b" />
+
+                <path d="M 16 42 Q 16 46 32 46 Q 48 46 48 42" fill="#fbbf24" />
+
+              </svg>
+
+            </div>
+
+            <h3 class="text-2xl font-bold text-gray-800 mb-3">Pesan Menu</h3>
+
+            <p class="text-gray-600 mb-6">Pilih Menu</p>
+
+            <button onclick="showOrderPage()" class="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-4 rounded-xl font-semibold text-lg hover:from-orange-600 hover:to-yellow-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
+
+              Pesan Sekarang →
+
+            </button>
+
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-xl p-8 text-center hover:shadow-2xl transition-all transform hover:-translate-y-1">
+
+            <div class="w-20 h-20 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-12 h-12">
+
+                <rect x="14" y="12" width="36" height="46" rx="3" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="2" />
+
+                <rect x="24" y="8" width="16" height="8" rx="2" fill="#0ea5e9" />
+
+                <rect x="26" y="10" width="12" height="6" rx="1" fill="#7dd3fc" />
+
+                <path d="M 20 24 L 23 27 L 28 22" stroke="#0ea5e9" stroke-width="2" fill="none" stroke-linecap="round" />
+
+                <line x1="32" y1="25" x2="44" y2="25" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" />
+
+                <path d="M 20 34 L 23 37 L 28 32" stroke="#0ea5e9" stroke-width="2" fill="none" stroke-linecap="round" />
+
+                <line x1="32" y1="35" x2="44" y2="35" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" />
+
+                <path d="M 20 44 L 23 47 L 28 42" stroke="#0ea5e9" stroke-width="2" fill="none" stroke-linecap="round" />
+
+                <line x1="32" y1="45" x2="44" y2="45" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" />
+
+              </svg>
+
+            </div>
+
+            <h3 class="text-2xl font-bold text-gray-800 mb-3">Cek Pesanan</h3>
+
+            <p class="text-gray-600 mb-6">Cek status</p>
+
+            <button onclick="showCheckPage()" class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-4 rounded-xl font-semibold text-lg hover:from-blue-600 hover:to-cyan-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
+
+              Cek Status →
+
+            </button>
+
+          </div>
+
+        </div>
 
       </div>
+
     </main>
 
     <footer class="bg-white py-6 px-6 shadow-lg">
+
       <div class="max-w-4xl mx-auto text-center text-gray-600"></div>
+
     </footer>
+
   </div>
 
-  <!-- Order Page -->
   <div id="orderPage" class="hidden min-h-screen">
+
     <header class="bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-6 px-6 shadow-lg sticky top-0 z-40">
+
       <div class="max-w-6xl mx-auto flex items-center justify-between">
+
         <button onclick="showLandingPage()" class="text-white hover:bg-white/20 px-4 py-2 rounded-lg transition-all">← Kembali</button>
+
         <h1 class="text-2xl font-bold">Pesan Menu</h1>
+
         <div class="w-20"></div>
+
       </div>
+
     </header>
 
     <main class="max-w-6xl mx-auto px-6 py-8">
-      <!-- Search & Filter -->
+
       <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+
         <input type="text" id="searchInput" placeholder="Cari menu" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-all" oninput="filterMenu()">
+
         <div class="mt-4 flex flex-wrap">
+
           <span class="category-badge active bg-gradient-to-r from-orange-500 to-yellow-500 text-white" onclick="filterCategory('Semua')">Semua</span>
+
           <span class="category-badge bg-orange-100 text-orange-700" onclick="filterCategory('Snack')">Snack</span>
+
           <span class="category-badge bg-yellow-100 text-yellow-700" onclick="filterCategory('Roti')">Roti</span>
+
           <span class="category-badge bg-blue-100 text-blue-700" onclick="filterCategory('Minuman')">Minuman</span>
+
         </div>
+
       </div>
 
-      <!-- Menu Grid -->
       <div id="menuGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8"></div>
 
-      <!-- Cart Summary -->
       <div id="cartSummary" class="hidden fixed bottom-0 left-0 right-0 bg-white shadow-2xl border-t-4 border-orange-500 z-30">
+
         <div class="max-w-6xl mx-auto px-6 py-4">
+
           <div class="flex items-center justify-between">
+
             <div>
+
               <p class="text-sm text-gray-600">Total Pesanan</p>
+
               <p class="text-2xl font-bold text-orange-600" id="cartTotal">Rp 0</p>
+
               <p class="text-xs text-gray-500" id="cartItems">0 item</p>
+
             </div>
+
             <button onclick="showCheckoutForm()" class="bg-gradient-to-r from-orange-500 to-yellow-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-orange-600 hover:to-yellow-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
+
               Lanjut Pesan →
+
             </button>
+
           </div>
+
         </div>
+
       </div>
 
-      <!-- Checkout Form Modal -->
       <div id="checkoutModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-6">
+
         <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90%] overflow-y-auto">
+
           <div class="sticky top-0 bg-gradient-to-r from-orange-500 to-yellow-500 text-white p-6 rounded-t-2xl">
+
             <h2 class="text-2xl font-bold">Detail Pesanan</h2>
+
           </div>
+
           <div class="p-6">
-            <!-- Order Summary -->
+
             <div class="bg-orange-50 rounded-xl p-4 mb-6">
+
               <h3 class="font-semibold text-gray-800 mb-3">Ringkasan Pesanan:</h3>
+
               <div id="orderSummaryList" class="space-y-2 text-sm"></div>
+
               <div class="border-t-2 border-orange-200 mt-3 pt-3">
+
                 <div class="flex justify-between items-center">
+
                   <span class="font-bold text-gray-800">Total:</span>
+
                   <span class="font-bold text-xl text-orange-600" id="checkoutTotal">Rp 0</span>
+
                 </div>
+
               </div>
+
             </div>
 
-            <!-- Customer Form -->
             <form id="checkoutForm" onsubmit="submitOrder(event)" class="space-y-4">
+
               <div>
+
   <div>
+
   <label for="customerClass" class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
+
   <select
+
     id="customerClass"
+
     required
+
     class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-all bg-white"
+
   >
+
     <option value="" disabled selected>Pilih kelas</option>
 
     <optgroup label="Kelas 10">
+
       <option value="10A">10A</option>
+
       <option value="10B">10B</option>
+
       <option value="10C">10C</option>
+
       <option value="10D">10D</option>
+
       <option value="10E">10E</option>
+
       <option value="10F">10F</option>
+
       <option value="10G">10G</option>
+
       <option value="10H">10H</option>
+
       <option value="10I">10I</option>
+
     </optgroup>
 
     <optgroup label="Kelas 11">
+
       <option value="11A">11A</option>
+
       <option value="11B">11B</option>
+
       <option value="11C">11C</option>
+
       <option value="11D">11D</option>
+
       <option value="11E">11E</option>
+
       <option value="11F">11F</option>
+
       <option value="11G">11G</option>
+
       <option value="11H">11H</option>
+
       <option value="11I">11I</option>
+
     </optgroup>
 
     <optgroup label="Kelas 12">
-      <option value="12A">12A</option>
-      <option value="12B">12B</option>
-      <option value="12C">12C</option>
-      <option value="12D">12D</option>
-      <option value="12E">12E</option>
-      <option value="12F">12F</option>
-      <option value="12G">12G</option>
-      <option value="12H">12H</option>
-      <option value="12I">12I</option>
-    </optgroup>
-  </select>
-</div>
 
+      <option value="12A">12A</option>
+
+      <option value="12B">12B</option>
+
+      <option value="12C">12C</option>
+
+      <option value="12D">12D</option>
+
+      <option value="12E">12E</option>
+
+      <option value="12F">12F</option>
+
+      <option value="12G">12G</option>
+
+      <option value="12H">12H</option>
+
+      <option value="12I">12I</option>
+
+    </optgroup>
+
+  </select>
+
+</div>
 
               <div>
+
                 <label for="customerNotes" class="block text-sm font-semibold text-gray-700 mb-2">Catatan</label>
+
                 <textarea id="customerNotes" rows="3" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-all" placeholder="Contoh: mie jangan diseduh"></textarea>
+
               </div>
+
               <div class="flex gap-3 pt-4">
+
                 <button type="button" onclick="closeCheckoutModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-300 transition-all">Batal</button>
+
                 <button type="submit" class="flex-1 bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-yellow-600 transition-all shadow-lg">Konfirmasi Pesanan</button>
+
               </div>
+
             </form>
+
           </div>
+
         </div>
+
       </div>
+
     </main>
+
   </div>
-  <!-- Modal Nomor Pesanan -->
-<div
-  id="orderIdModal"
-  class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4 sm:px-6"
->
-  <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-    <h2 class="text-xl font-bold text-gray-800 mb-2">Pesanan Berhasil Dibuat</h2>
-    <p class="text-sm text-gray-600 mb-4">
-      Simpan nomor pesanan di bawah ini untuk cek status di menu
-      <span class="font-semibold">Cek Pesanan</span>.
-    </p>
 
-    <div class="bg-gray-100 rounded-xl px-4 py-3 flex items-center justify-between gap-2 mb-3">
-      <span
-        id="orderIdDisplay"
-        class="font-mono text-xs sm:text-sm text-gray-800 break-all"
-      ></span>
-      <button
-        type="button"
-        onclick="copyOrderId()"
-        class="shrink-0 text-xs sm:text-sm font-semibold px-3 py-1 rounded-lg
-               bg-gradient-to-r from-blue-500 to-cyan-500 text-white
-               hover:from-blue-600 hover:to-cyan-600"
-      >
-        Salin
-      </button>
-    </div>
+  <div id="orderIdModal"
 
-    <div id="copyStatus" class="text-xs text-green-600 mb-4 hidden">
-      Nomor pesanan sudah disalin.
-    </div>
+       class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-6">
 
-    <div class="flex flex-col sm:flex-row gap-3">
-      <button
-        type="button"
-        onclick="closeOrderIdModal()"
-        class="flex-1 py-2 rounded-xl font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300"
-      >
-        Tutup
-      </button>
-      <button
-        type="button"
-        onclick="goToCheckPageWithOrder()"
-        class="flex-1 py-2 rounded-xl font-semibold
-               bg-gradient-to-r from-blue-500 to-cyan-500 text-white
-               hover:from-blue-600 hover:to-cyan-600"
-      >
-        Cek Status Pesanan
-      </button>
-    </div>
-  </div>
-</div>
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
 
-  <!-- Check Order Page -->
-  <div id="checkPage" class="hidden min-h-screen">
-    <header class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-6 px-6 shadow-lg">
-      <div class="max-w-4xl mx-auto flex items-center justify-between">
-        <button onclick="showLandingPage()" class="text-white hover:bg-white/20 px-4 py-2 rounded-lg transition-all">← Kembali</button>
-        <h1 class="text-2xl font-bold">Cek Pesanan</h1>
-        <div class="w-20"></div>
+      <h2 class="text-xl font-bold text-gray-800 mb-2">Pesanan Berhasil Dibuat</h2>
+
+      <p class="text-sm text-gray-600 mb-4">
+
+        Simpan nomor pesanan di bawah ini untuk cek status di menu
+
+        <span class="font-semibold">Cek Pesanan</span>.
+
+      </p>
+
+      <div class="bg-gray-100 rounded-xl px-4 py-3 flex items-center justify-between gap-2 mb-3">
+
+        <span id="orderIdDisplay"
+
+              class="font-mono text-xs sm:text-sm text-gray-800 break-all"></span>
+
+        <button type="button"
+
+                onclick="copyOrderId()"
+
+                class="shrink-0 text-xs sm:text-sm font-semibold px-3 py-1 rounded-lg
+
+                       bg-gradient-to-r from-blue-500 to-cyan-500 text-white
+
+                       hover:from-blue-600 hover:to-cyan-600">
+
+          Salin
+
+        </button>
+
       </div>
+
+      <div id="copyStatus" class="text-xs text-green-600 mb-4 hidden">
+
+        Nomor pesanan sudah disalin.
+
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+
+        <button type="button"
+
+                onclick="closeOrderIdModal()"
+
+                class="flex-1 py-2 rounded-xl font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300">
+
+          Tutup
+
+        </button>
+
+        <button type="button"
+
+                onclick="goToCheckPageWithOrder()"
+
+                class="flex-1 py-2 rounded-xl font-semibold
+
+                       bg-gradient-to-r from-blue-500 to-cyan-500 text-white
+
+                       hover:from-blue-600 hover:to-cyan-600">
+
+          Cek Status Pesanan
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div id="checkPage" class="hidden min-h-screen">
+
+    <header class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-6 px-6 shadow-lg">
+
+      <div class="max-w-4xl mx-auto flex items-center justify-between">
+
+        <button onclick="showLandingPage()" class="text-white hover:bg-white/20 px-4 py-2 rounded-lg transition-all">← Kembali</button>
+
+        <h1 class="text-2xl font-bold">Cek Pesanan</h1>
+
+        <div class="w-20"></div>
+
+      </div>
+
     </header>
 
     <main class="max-w-4xl mx-auto px-6 py-8">
+
       <div class="bg-white rounded-2xl shadow-xl p-8">
+
         <label for="orderIdInput" class="block text-sm font-semibold text-gray-700 mb-2">Nomor Pesanan</label>
-        <div class="flex flex-col sm:flex-row gap-3">
-  <input
-    type="text"
-    id="orderIdInput"
-    placeholder="Masukkan nomor pesanan"
-    class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl
-           focus:border-blue-500 focus:outline-none transition-all"
-  />
-  <button
-    onclick="checkOrder()"
-    class="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-cyan-500 text-white
-           px-8 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-cyan-600
-           transition-all shadow-lg text-center"
-  >
-    Cek
-  </button>
-</div>
+
+        <div class="flex gap-3">
+
+          <input type="text" id="orderIdInput" placeholder="Masukkan nomor pesanan" class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all" />
+
+          <button onclick="checkOrder()" class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-8 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all shadow-lg">Cek</button>
+
+        </div>
 
       </div>
 
-      <!-- Hasil Cek -->
       <div id="orderResult" class="hidden mt-8 bg-white rounded-2xl shadow-xl overflow-hidden">
-        <div class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white p-6">
-          <h2 class="text-xl font-bold">Detail Pesanan</h2>
-          <p class="text-sm opacity-90" id="resultOrderId"></p>
-        </div>
-        <div class="mb-6">
-  <h3 class="font-semibold text-gray-800 mb-3">Informasi Pemesan:</h3>
-  <div class="bg-gray-50 rounded-xl p-4 space-y-2">
-    <p class="text-sm"><span class="font-semibold">Kelas:</span> <span id="resultClass"></span></p>
-    <p class="text-sm"><span class="font-semibold">Waktu Pesan:</span> <span id="resultTime"></span></p>
-  </div>
-</div>
 
+        <div class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white p-6">
+
+          <h2 class="text-xl font-bold">Detail Pesanan</h2>
+
+          <p class="text-sm opacity-90" id="resultOrderId"></p>
+
+        </div>
+
+        <div class="p-6">
 
           <div class="mb-6">
+
+            <h3 class="font-semibold text-gray-800 mb-3">Informasi Pemesan:</h3>
+
+            <div class="bg-gray-50 rounded-xl p-4 space-y-2">
+
+              <p class="text-sm"><span class="font-semibold">Nama:</span> <span id="resultName"></span></p>
+
+              <p class="text-sm"><span class="font-semibold">Kelas:</span> <span id="resultClass"></span></p>
+
+              <p class="text-sm"><span class="font-semibold">Waktu Pesan:</span> <span id="resultTime"></span></p>
+
+            </div>
+
+          </div>
+
+          <div class="mb-6">
+
             <h3 class="font-semibold text-gray-800 mb-3">Pesanan:</h3>
+
             <div id="resultItems" class="space-y-2"></div>
+
           </div>
 
           <div id="resultNotesSection" class="mb-6 hidden">
+
             <h3 class="font-semibold text-gray-800 mb-3">Catatan:</h3>
+
             <div class="bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-4">
+
               <p class="text-sm text-gray-700" id="resultNotes"></p>
+
             </div>
+
           </div>
 
           <div class="mb-6">
+
             <h3 class="font-semibold text-gray-800 mb-4">Status Pesanan:</h3>
+
             <div class="relative">
+
               <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+
               <div id="statusTimeline" class="space-y-6"></div>
+
             </div>
+
           </div>
 
           <div class="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-200">
+
             <div class="flex justify-between items-center">
+
               <span class="font-bold text-gray-800">Total:</span>
+
               <span class="font-bold text-2xl text-blue-600" id="resultTotal"></span>
+
             </div>
+
           </div>
+
         </div>
+
       </div>
 
       <div id="orderNotFound" class="hidden mt-8 bg-white rounded-2xl shadow-xl p-8 text-center">
+
         <h3 class="text-xl font-bold text-gray-800 mb-2">Pesanan Tidak Ditemukan</h3>
+
         <p class="text-gray-600">Periksa kembali nomor pesanan</p>
+
       </div>
+
     </main>
+
   </div>
+
 <script>
 
-      // ===================== NAVIGASI HALAMAN =====================
   function showLandingPage() {
+
     document.getElementById('landingPage').classList.remove('hidden');
+
     document.getElementById('orderPage').classList.add('hidden');
+
     document.getElementById('checkPage').classList.add('hidden');
+
   }
 
   function showOrderPage() {
+
     document.getElementById('landingPage').classList.add('hidden');
+
     document.getElementById('orderPage').classList.remove('hidden');
+
     document.getElementById('checkPage').classList.add('hidden');
-    // pastikan menu muncul saat buka halaman order
+
     renderMenu();
+
   }
 
   function showCheckPage() {
+
     document.getElementById('landingPage').classList.add('hidden');
+
     document.getElementById('orderPage').classList.add('hidden');
+
     document.getElementById('checkPage').classList.remove('hidden');
 
-    // reset tampilan cek pesanan
     const resultBox   = document.getElementById('orderResult');
+
     const notFoundBox = document.getElementById('orderNotFound');
+
     const orderInput  = document.getElementById('orderIdInput');
 
     if (resultBox)   resultBox.classList.add('hidden');
+
     if (notFoundBox) notFoundBox.classList.add('hidden');
+
     if (orderInput)  orderInput.value = '';
+
   }
 
-  // ===================== DATA MENU =====================
   const menuItems = [
-    // Snack
+
     { id: 1, name: 'Bakwan', price: 1000, category: 'Snack', image: 'bakwan.jpg', soldOut: false },
+
     { id: 2, name: 'Dayaki', price: 1000, category: 'Snack', image: 'dayaki.jpg', soldOut: false },
+
     { id: 3, name: 'Pop Mie', price: 7000, category: 'Snack', image: 'popmie.jpg', soldOut: false },
+
     { id: 4, name: 'Klepon', price: 2000, category: 'Snack', image: 'klepon.jpg', soldOut: false },
+
     { id: 5, name: 'Nabati', price: 2000, category: 'Snack', image: 'nabati.jpg', soldOut: false },
+
     { id: 6, name: 'Wafello', price: 2000, category: 'Snack', image: 'wafello.jpg', soldOut: false },
+
     { id: 7, name: 'Pia Bali', price: 1000, category: 'Snack', image: 'piabali.jpg', soldOut: false },
+
     { id: 8, name: 'Lemonilo', price: 1000, category: 'Snack', image: 'lemonilo.jpg', soldOut: false },
+
     { id: 9, name: 'Better', price: 1000, category: 'Snack', image: 'better.jpg', soldOut: false },
+
     { id: 10, name: 'Malkis', price: 1000, category: 'Snack', image: 'malkis.jpg', soldOut: false },
+
     { id: 11, name: 'Gery Salut', price: 1000, category: 'Snack', image: 'gerysalut.jpg', soldOut: false },
+
     { id: 12, name: 'Tic Tac', price: 1000, category: 'Snack', image: 'tiktak.jpg', soldOut: false },
 
-    // Roti Beta (dengan varian)
     {
+
       id: 13, name: 'Roti Beta', price: 1000, category: 'Roti', image: 'rotibeta.jpg',
+
       soldOut: false, hasVariants: true,
+
       variants: [
+
         { name: 'Original', price: 1000, image: 'rotibeta.jpg' },
+
         { name: 'Moka', price: 1000, image: 'rotibeta_moka.jpg' },
+
         { name: 'Cream', price: 1000, image: 'rotibeta_cream.jpg' },
+
         { name: 'Kompiang', price: 1000, image: 'rotibeta_kompiang.jpg' },
+
         { name: 'Kacang Hijau', price: 1000, image: 'rotibeta_kacanghijau.jpg' }
+
       ]
+
     },
 
-    // Kacang Garuda (varian)
     {
+
       id: 14, name: 'Kacang Garuda', price: 1000, category: 'Snack', image: 'garuda_original.jpg',
+
       soldOut: false, hasVariants: true,
+
       variants: [
+
         { name: 'Original', price: 1000, image: 'garuda_original.jpg' },
+
         { name: 'Atom', price: 1000, image: 'garuda_atom.jpg' }
+
       ]
+
     },
 
-    // Permen (varian)
     {
+
       id: 15, name: 'Permen', price: 1000, category: 'Snack', image: 'permen_kaki.jpg',
+
       soldOut: false, hasVariants: true,
+
       variants: [
+
         { name: 'Permen Kaki', price: 1000, image: 'permen_kaki.jpg' },
+
         { name: 'Permen Mexico', price: 1000, image: 'permen_mexico.jpg' },
+
         { name: 'Permen Kopiko', price: 1000, image: 'kopiko.jpg' },
+
         { name: 'Permen Karet', price: 1000, image: 'permenkaret.jpg' },
+
         { name: 'Pendekar Biru', price: 1000, image: 'pendekarbiru.jpg' },
+
         { name: 'Permen Mentos', price: 1000, image: 'mentos.jpg' }
+
       ]
+
     },
 
-    // Roti
     { id: 16, name: 'Donat', price: 1000, category: 'Roti', image: 'donat.jpg', soldOut: false },
+
     { id: 17, name: 'Pukis', price: 1000, category: 'Roti', image: 'pukis.jpg', soldOut: false },
 
-    // Minuman
     { id: 18, name: 'Golda Coffee', price: 5000, category: 'Minuman', image: 'golda.jpg', soldOut: false },
+
     { id: 19, name: 'Floridina', price: 5000, category: 'Minuman', image: 'floridina.jpg', soldOut: false },
+
     { id: 20, name: 'Milku', price: 5000, category: 'Minuman', image: 'milku.jpg', soldOut: false },
+
     { id: 21, name: 'Vita Jelly', price: 1000, category: 'Minuman', image: 'vitajelly.jpg', soldOut: false },
+
     { id: 22, name: 'Ale Ale', price: 1000, category: 'Minuman', image: 'aleale.jpg', soldOut: false },
+
     { id: 23, name: 'Teh Pucuk', price: 5000, category: 'Minuman', image: 'tehpucuk.jpg', soldOut: false },
+
     { id: 24, name: 'Teh Rio', price: 1000, category: 'Minuman', image: 'tehrio.jpg', soldOut: false },
+
     { id: 25, name: 'Air Putih', price: 1000, category: 'Minuman', image: 'airputih.jpg', soldOut: false }
+
   ];
 
-  // ===================== VARIABEL =====================
   let cart = [];
-  let currentFilter = 'Semua';
-  let selectedVariants = {};
-  let lastOrderId = null; // simpan nomor pesanan terakhir untuk modal & copy
 
+  let currentFilter = 'Semua';
+
+  let selectedVariants = {};
+
+  let lastOrderId = null;
 
   function formatCurrency(amount) {
+
     return 'Rp ' + amount.toLocaleString('id-ID');
+
   }
 
-  // ===================== RENDER MENU (PAKAI STATUS FIREBASE) =====================
   function renderMenu() {
+
     const menuGrid   = document.getElementById('menuGrid');
+
     const searchTerm = (document.getElementById('searchInput')?.value || '').toLowerCase();
 
     let filteredItems = menuItems;
 
-    // filter kategori
     if (currentFilter !== 'Semua') {
+
       filteredItems = filteredItems.filter(item => item.category === currentFilter);
+
     }
 
-    // filter search
     if (searchTerm) {
+
       filteredItems = filteredItems.filter(item =>
+
         item.name.toLowerCase().includes(searchTerm)
+
       );
+
     }
 
     const statusMap = window.menuStatus || {};
 
     menuGrid.innerHTML = filteredItems.map(item => {
+
       const selectedVariant = selectedVariants[item.id];
+
       const variantName = selectedVariant
+
         ? selectedVariant.name
+
         : (item.hasVariants ? item.variants[0].name : null);
 
       const cartItem = cart.find(
+
         c => c.id === item.id && (c.variant || '') === (variantName || '')
+
       );
+
       const quantity = cartItem ? cartItem.quantity : 0;
 
       const displayImage = selectedVariant ? selectedVariant.image : item.image;
+
       const displayPrice = selectedVariant ? selectedVariant.price : item.price;
 
-      // status dari Firebase
       const status           = statusMap[item.id] || {};
+
       const menuDisabled     = status.disabled === true;
+
       const disabledVariants = status.disabledVariants || {};
 
-      // kalau di data awal soldOut = true ATAU menuDisabled = true → anggap habis
       const isSoldOut = item.soldOut || menuDisabled;
 
-      // teks kecil di bawah harga
       let statusText = '';
+
       if (menuDisabled) {
+
         statusText = '<p class="text-xs text-red-500 font-semibold mt-1">Menu sedang tidak tersedia</p>';
+
       } else if (item.hasVariants && Object.values(disabledVariants).some(Boolean)) {
+
         statusText = '<p class="text-xs text-amber-500 mt-1">Beberapa varian habis</p>';
+
       }
 
       return `
+
         <div class="menu-card bg-white rounded-2xl shadow-lg overflow-hidden ${isSoldOut ? 'opacity-60' : ''}">
+
           <div class="relative">
+
             <img id="menu-img-${item.id}" src="${displayImage}" alt="${item.name}" class="menu-image" onerror="this.src='fallback.jpg'">
+
             ${isSoldOut
+
               ? '<div class="absolute inset-0 bg-black/50 flex items-center justify-center"><span class="bg-red-500 text-white px-4 py-2 rounded-lg font-bold">TIDAK TERSEDIA</span></div>'
+
               : ''
+
             }
+
           </div>
+
           <div class="p-4">
+
             <h3 class="font-bold text-gray-800 text-lg mb-1">${item.name}</h3>
+
             <p class="text-orange-600 font-bold text-xl mb-1" id="price-${item.id}">${formatCurrency(displayPrice)}</p>
+
             ${statusText}
 
             ${item.hasVariants ? `
+
               <div class="relative mt-3 mb-3">
+
                 <button
+
                   id="variant-btn-${item.id}"
+
                   onclick="toggleVariantPopup(${item.id})"
+
                   class="w-full bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-200 transition-all"
+
                   ${isSoldOut ? 'disabled' : ''}
+
                 >
+
                   Varian: ${variantName} ▼
+
                 </button>
+
                 <div id="variant-popup-${item.id}" class="variant-popup">
+
                   <div class="p-3">
+
                     <p class="font-semibold text-gray-800 mb-2 text-sm">Pilih Varian:</p>
+
                     ${
+
                       item.variants.map((variant, idx) => {
+
                         const vDisabled = !!disabledVariants[variant.name];
+
                         const isChecked =
+
                           (selectedVariant && selectedVariant.index === idx) ||
+
                           (!selectedVariant && idx === 0);
+
                         return `
+
                           <label class="flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all ${vDisabled ? 'opacity-50' : 'hover:bg-gray-50'}">
+
                             <input
+
                               type="radio"
+
                               name="variant-${item.id}"
+
                               value="${idx}"
+
                               ${isChecked ? 'checked' : ''}
+
                               ${vDisabled ? 'disabled' : ''}
+
                               onchange="selectVariant(${item.id}, ${idx})"
+
                               class="w-4 h-4 text-orange-500">
+
                             <span class="flex-1 text-sm text-gray-700">
+
                               ${variant.name}${vDisabled ? ' (Habis)' : ''}
+
                             </span>
+
                             <span class="text-sm font-semibold text-orange-600">
+
                               ${formatCurrency(variant.price)}
+
                             </span>
+
                           </label>
+
                         `;
+
                       }).join('')
+
                     }
+
                   </div>
+
                 </div>
+
               </div>
+
             ` : ''}
 
             ${
+
               isSoldOut
+
                 ? `
+
                   <button disabled class="mt-1 w-full bg-gray-300 text-gray-500 py-2 rounded-lg font-semibold cursor-not-allowed">
+
                     Tidak Tersedia
+
                   </button>
+
                 `
+
                 : quantity === 0
+
                   ? `
+
                     <button onclick="addToCart(${item.id})"
+
                       class="mt-1 w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-2 rounded-lg font-semibold hover:from-orange-600 hover:to-yellow-600 transition-all shadow-md">
+
                       + Tambah
+
                     </button>
+
                   `
+
                   : `
+
                     <div class="mt-1 flex items-center gap-2">
+
                       <button onclick="decreaseQuantity(${item.id}, '${variantName ?? ''}')"
+
                         class="flex-1 bg-red-500 text-white py-2 rounded-lg font-bold hover:bg-red-600 transition-all">−</button>
+
                       <span class="flex-1 text-center font-bold text-lg text-gray-800">${quantity}</span>
+
                       <button onclick="increaseQuantity(${item.id}, '${variantName ?? ''}')"
+
                         class="flex-1 bg-green-500 text-white py-2 rounded-lg font-bold hover:bg-green-600 transition-all">+</button>
+
                     </div>
+
                   `
+
             }
+
           </div>
+
         </div>
+
       `;
+
     }).join('');
+
   }
 
-
-  // ===================== VARIAN POPUP =====================
   function toggleVariantPopup(itemId) {
+
     const popup = document.getElementById(`variant-popup-${itemId}`);
+
     document.querySelectorAll('.variant-popup').forEach(p => { if (p.id !== popup.id) p.classList.remove('active'); });
+
     popup.classList.toggle('active');
+
   }
 
   function selectVariant(itemId, variantIndex) {
+
     const item = menuItems.find(m => m.id === itemId);
+
     const variant = item.variants[variantIndex];
+
     selectedVariants[itemId] = { index: variantIndex, name: variant.name, price: variant.price, image: variant.image };
+
     renderMenu();
+
   }
 
   document.addEventListener('click', function (event) {
+
     if (!event.target.closest('.menu-card')) {
+
       document.querySelectorAll('.variant-popup').forEach(popup => popup.classList.remove('active'));
+
     }
+
   });
 
   function addToCart(itemId) {
+
     const item = menuItems.find(m => m.id === itemId);
+
     const selectedVariant = selectedVariants[itemId];
+
     const variantName = selectedVariant
+
       ? selectedVariant.name
+
       : (item.hasVariants ? item.variants[0].name : null);
 
-    // Cek status dari Firebase
     const statusMap       = window.menuStatus || {};
+
     const status          = statusMap[item.id] || {};
+
     const menuDisabled    = status.disabled === true;
+
     const disabledVariants = status.disabledVariants || {};
 
     if (menuDisabled) {
+
       alert("Menu ini sedang tidak tersedia.");
+
       return;
+
     }
 
     if (variantName && disabledVariants[variantName]) {
+
       alert("Varian ini sedang tidak tersedia.");
+
       return;
+
     }
 
     const existing = cart.find(
+
       c => c.id === item.id && (c.variant || '') === (variantName || '')
+
     );
 
     if (existing) {
+
       existing.quantity++;
+
     } else {
+
       cart.push({
+
         id: item.id,
+
         name: item.name,
+
         price: selectedVariant ? selectedVariant.price : item.price,
+
         quantity: 1,
-        variant: variantName || ''   // standar: kalau nggak ada varian, simpan '' saja
+
+        variant: variantName || ''
+
       });
+
     }
 
     updateCart();
+
     renderMenu();
+
   }
 
-
   function increaseQuantity(itemId, variantName) {
+
     const statusMap        = window.menuStatus || {};
+
     const status           = statusMap[itemId] || {};
+
     const menuDisabled     = status.disabled === true;
+
     const disabledVariants = status.disabledVariants || {};
 
     if (menuDisabled) {
+
       alert("Menu ini sedang tidak tersedia.");
+
       return;
+
     }
 
     if (variantName && disabledVariants[variantName]) {
+
       alert("Varian ini sedang tidak tersedia.");
+
       return;
+
     }
 
     const item = cart.find(
+
       c => c.id === itemId && (c.variant || '') === (variantName || '')
+
     );
+
     if (item) item.quantity++;
+
     updateCart();
+
     renderMenu();
+
   }
 
   function decreaseQuantity(itemId, variantName) {
+
   const item = cart.find(
+
     c => c.id === itemId && (c.variant || '') === (variantName || '')
+
   );
+
   if (!item) return;
 
   item.quantity--;
+
   if (item.quantity <= 0) {
+
     cart = cart.filter(
+
       c => !(c.id === itemId && (c.variant || '') === (variantName || ''))
+
     );
+
   }
+
   updateCart();
+
   renderMenu();
+
 }
 
-
-
-
   function updateCart() {
+
     const cartSummary = document.getElementById('cartSummary');
+
     const cartTotal = document.getElementById('cartTotal');
+
     const cartItems = document.getElementById('cartItems');
+
     if (cart.length === 0) {
+
       cartSummary.classList.add('hidden');
+
       return;
+
     }
+
     cartSummary.classList.remove('hidden');
+
     const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+
     cartTotal.textContent = formatCurrency(total);
+
     cartItems.textContent = `${totalItems} item`;
+
   }
 
-  // ===================== FILTER =====================
   function filterCategory(category) {
+
     currentFilter = category;
+
     document.querySelectorAll('.category-badge').forEach(b => b.classList.remove('active', 'bg-gradient-to-r', 'from-orange-500', 'to-yellow-500', 'text-white'));
+
     event.target.classList.add('active', 'bg-gradient-to-r', 'from-orange-500', 'to-yellow-500', 'text-white');
+
     renderMenu();
+
   }
 
   function filterMenu() { renderMenu(); }
 
-  // ===================== CHECKOUT =====================
   function showCheckoutForm() {
+
     const modal = document.getElementById('checkoutModal');
+
     const orderSummaryList = document.getElementById('orderSummaryList');
+
     const checkoutTotal = document.getElementById('checkoutTotal');
+
     orderSummaryList.innerHTML = cart.map(item => `
+
       <div class="flex justify-between items-center">
+
         <span class="text-gray-700">${item.name}${item.variant ? ` (${item.variant})` : ''} x${item.quantity}</span>
+
         <span class="font-semibold text-gray-800">${formatCurrency(item.price * item.quantity)}</span>
+
       </div>
+
     `).join('');
+
     checkoutTotal.textContent = formatCurrency(cart.reduce((sum, item) => sum + item.price * item.quantity, 0));
+
     modal.classList.remove('hidden');
+
   }
 
   function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
 
-  // ===================== ANIMASI KETIK =====================
   let repeatCount = 0;
+
   function typeWriter() {
+
     repeatCount++;
+
     const text = (repeatCount % 5 === 0) ? "lockrr" : "Mau pesan apa hari ini??";
+
     const typingElement = document.getElementById('typingText');
+
     let i = 0;
+
     function type() {
+
       if (i < text.length) {
+
         typingElement.textContent += text.charAt(i);
+
         i++;
+
         setTimeout(type, 100);
+
       } else {
+
         setTimeout(() => { typingElement.textContent = ''; i = 0; typeWriter(); }, 5000);
+
       }
+
     }
+
     type();
+
   }
 
-    // ===================== MODAL NOMOR PESANAN =====================
   function showOrderIdModal(orderId) {
+
     lastOrderId = orderId;
 
     const modal     = document.getElementById('orderIdModal');
+
     const textEl    = document.getElementById('orderIdDisplay');
+
     const copyState = document.getElementById('copyStatus');
 
     if (textEl) textEl.textContent = orderId;
+
     if (copyState) copyState.classList.add('hidden');
+
     if (modal) modal.classList.remove('hidden');
+
   }
 
   function closeOrderIdModal() {
+
     const modal = document.getElementById('orderIdModal');
+
     if (modal) modal.classList.add('hidden');
+
   }
 
-  // salin nomor pesanan ke clipboard
   function copyOrderId() {
+
     if (!lastOrderId) return;
 
     const copyState = document.getElementById('copyStatus');
 
     function showCopied() {
+
       if (!copyState) return;
+
       copyState.textContent = 'Nomor pesanan sudah disalin.';
+
       copyState.classList.remove('hidden');
+
       setTimeout(() => copyState.classList.add('hidden'), 2000);
+
     }
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
+
       navigator.clipboard.writeText(lastOrderId)
+
         .then(showCopied)
+
         .catch(showCopied);
+
     } else {
-      // fallback lama
+
       const temp = document.createElement('textarea');
+
       temp.value = lastOrderId;
+
       temp.style.position = 'fixed';
+
       temp.style.opacity = '0';
+
       document.body.appendChild(temp);
+
       temp.focus();
+
       temp.select();
+
       try { document.execCommand('copy'); } catch (e) {}
+
       document.body.removeChild(temp);
+
       showCopied();
+
     }
+
   }
 
-  // buka halaman cek + otomatis isi input nomor pesanan
   function goToCheckPageWithOrder() {
+
     if (!lastOrderId) return;
 
-    showCheckPage(); // fungsi yang sudah ada
+    showCheckPage();
 
     const input = document.getElementById('orderIdInput');
+
     if (input) {
+
       input.value = lastOrderId;
+
       input.focus();
+
       input.select();
+
     }
 
     closeOrderIdModal();
+
   }
 
   window.addEventListener('load', () => { renderMenu(); typeWriter(); });
 
 </script>
-<!-- ==== FIREBASE SDK + BACKEND LOGIC (PROJECT KANTIN-SEKOLAH-E6AEA) ==== -->
-<!-- Popup CSS -->
+
 <style>
+
 .popup-container {
+
     position: fixed;
+
     top: 0;
+
     left: 0;
+
     width: 100%;
+
     height: 100%;
+
     background: rgba(0,0,0,0.5);
+
     display: none;
+
     justify-content: center;
+
     align-items: center;
+
     z-index: 9999;
+
 }
 
 .popup-box {
+
     background: white;
+
     padding: 20px;
+
     border-radius: 12px;
+
     width: 300px;
+
     text-align: center;
+
     font-family: Arial;
+
 }
+
 </style>
 
-<!-- Popup HTML -->
 <div class="popup-container" id="orderPopup">
+
   <div class="popup-box">
+
     <h3>Order berhasil!</h3>
+
     <p>Total: <span id="popupTotal"></span></p>
+
     <p>Order Number: <span id="popupOrderNum"></span></p>
+
     <button onclick="copyOrderNumber()">Copy</button>
+
     <button onclick="closePopup()">Close</button>
+
   </div>
+
 </div>
 
 <script>
+
 function showPopup(total, orderNum) {
+
     document.getElementById("popupTotal").innerText = total;
+
     document.getElementById("popupOrderNum").innerText = orderNum;
+
     document.getElementById("orderPopup").style.display = "flex";
+
 }
 
 function closePopup() {
+
     document.getElementById("orderPopup").style.display = "none";
+
 }
 
 function copyOrderNumber() {
+
     navigator.clipboard.writeText(document.getElementById("popupOrderNum").innerText);
+
 }
+
 </script>
 
 <script type="module">
-  // Import Firebase v12 (modular, dari CDN)
+
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+
   import {
+
     getDatabase,
+
     ref,
+
     push,
+
     get,
+
     onValue
+
   } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
 
-  // CONFIG PROJECT KAMU (kantin-sekolah-e6aea)
   const firebaseConfig = {
+
     apiKey: "AIzaSyCkejTcOfPpedhrOx4gI4HVrejIM3G7cRg",
+
     authDomain: "kantin-sekolah-e6aea.firebaseapp.com",
+
     projectId: "kantin-sekolah-e6aea",
+
     storageBucket: "kantin-sekolah-e6aea.firebasestorage.app",
+
     messagingSenderId: "296536339754",
+
     appId: "1:296536339754:web:05fac7daec8b65dd211a53",
+
     databaseURL: "https://kantin-sekolah-e6aea-default-rtdb.asia-southeast1.firebasedatabase.app"
+
   };
 
-  // Init Firebase
   const app = initializeApp(firebaseConfig);
+
   const db  = getDatabase(app);
 
   console.log(" Terhubung ke Firebase kantin-sekolah-e6aea");
 
-  // === LISTENER REALTIME UNTUK STATUS MENU (ON/OFF + VARIAN) ===
   const menuStatusRef = ref(db, "menuStatus");
 
   onValue(menuStatusRef, (snapshot) => {
-    // simpan status ke global supaya bisa dipakai di renderMenu()
+
     window.menuStatus = snapshot.val() || {};
+
     if (typeof renderMenu === "function") {
+
       renderMenu();
+
     }
+
   });
 
-  // ======================================================
-  //  SUBMIT ORDER  (dipanggil dari form: onsubmit="submitOrder(event)")
-  // ======================================================
   window.submitOrder = async function submitOrder(event) {
+
     event.preventDefault();
 
     const customerClass = document.getElementById('customerClass').value;
+
     const customerNotes = document.getElementById('customerNotes').value.trim();
 
-    // Sekarang cuma wajib pilih kelas
     if (!customerClass) {
+
       alert("Kelas wajib dipilih.");
+
       return;
+
     }
 
     if (!Array.isArray(cart) || cart.length === 0) {
+
       alert("Keranjang masih kosong.");
+
       return;
+
     }
 
     const total = cart.reduce(
+
       (sum, item) => sum + item.price * item.quantity,
+
       0
+
     );
 
     const orderData = {
-      customerName: null,      // nama dihapus dari form, jadi null saja
+
+      customerName: null,
+
       customerClass,
+
       notes: customerNotes || null,
+
       items: cart.map(it => ({
+
         id: it.id,
+
         name: it.name,
+
         variant: it.variant || null,
+
         price: it.price,
+
         quantity: it.quantity
+
       })),
+
       total,
+
       status: "pending",
+
       createdAt: Date.now()
+
     };
 
     try {
+
   const ordersRef   = ref(db, "orders");
+
   const newOrderRef = await push(ordersRef, orderData);
+
   const orderId     = newOrderRef.key;
 
-  // Reset tampilan (tutup modal checkout, kosongkan keranjang, kembali ke landing)
   finishOrder();
 
-  // Tampilkan modal khusus nomor pesanan
   if (window.showOrderIdModal) {
+
     window.showOrderIdModal(orderId);
+
   }
 
 } catch (err) {
+
   console.error("Gagal menyimpan pesanan:", err);
+
   alert("Terjadi kesalahan saat menyimpan pesanan");
+
 }
 
   };
 
-// ======================================================
-//  CHECK ORDER  (dipanggil dari tombol: onclick="checkOrder()")
-// ======================================================
-window.checkOrder = async function checkOrder() {
-  const orderId = document.getElementById('orderIdInput').value.trim();
-  const resultBox   = document.getElementById('orderResult');
-  const notFoundBox = document.getElementById('orderNotFound');
+  window.checkOrder = async function checkOrder() {
 
-  if (!orderId) {
-    alert("Masukkan nomor pesanan terlebih dahulu.");
-    return;
-  }
+    const orderId = document.getElementById('orderIdInput').value.trim();
 
-  try {
-    const orderRef  = ref(db, 'orders/' + orderId);
-    const snapshot  = await get(orderRef);
+    const resultBox   = document.getElementById('orderResult');
 
-    if (!snapshot.exists()) {
-      // Pesanan tidak ditemukan
-      resultBox.classList.add('hidden');
-      notFoundBox.classList.remove('hidden');
+    const notFoundBox = document.getElementById('orderNotFound');
+
+    if (!orderId) {
+
+      alert("Masukkan nomor pesanan terlebih dahulu.");
+
       return;
+
     }
 
-    const order = snapshot.val();
+    try {
 
-    notFoundBox.classList.add('hidden');
-    resultBox.classList.remove('hidden');
+      const orderRef  = ref(db, 'orders/' + orderId);
 
-    // Isi data di UI
-    document.getElementById('resultOrderId').textContent = `#${orderId}`;
-    document.getElementById('resultClass').textContent   = order.customerClass || '-';
+      const snapshot  = await get(orderRef);
 
-    const when = order.createdAt ? new Date(order.createdAt) : new Date();
-    document.getElementById('resultTime').textContent = when.toLocaleString('id-ID');
+      if (!snapshot.exists()) {
 
-      // List item pesanan
-      document.getElementById('resultItems').innerHTML = (order.items || []).map(item => `
-        <div class="flex justify-between items-center bg-gray-50 rounded-lg p-3">
-          <span class="text-gray-700">
-            ${item.name}${item.variant ? ` (${item.variant})` : ''} x${item.quantity}
-          </span>
-          <span class="font-semibold text-gray-800">${formatCurrency(item.price * item.quantity)}</span>
-        </div>
-      `).join('');
+        resultBox.classList.add('hidden');
 
-      // Catatan
-      if (order.notes) {
-        document.getElementById('resultNotesSection').classList.remove('hidden');
-        document.getElementById('resultNotes').textContent = order.notes;
-      } else {
-        document.getElementById('resultNotesSection').classList.add('hidden');
+        notFoundBox.classList.remove('hidden');
+
+        return;
+
       }
 
-      // Total
+      const order = snapshot.val();
+
+      notFoundBox.classList.add('hidden');
+
+      resultBox.classList.remove('hidden');
+
+      document.getElementById('resultOrderId').textContent = `#${orderId}`;
+
+      document.getElementById('resultName').textContent    = order.customerName || '-';
+
+      document.getElementById('resultClass').textContent   = order.customerClass || '-';
+
+      const when = order.createdAt ? new Date(order.createdAt) : new Date();
+
+      document.getElementById('resultTime').textContent = when.toLocaleString('id-ID');
+
+      document.getElementById('resultItems').innerHTML = (order.items || []).map(item => `
+
+        <div class="flex justify-between items-center bg-gray-50 rounded-lg p-3">
+
+          <span class="text-gray-700">
+
+            ${item.name}${item.variant ? ` (${item.variant})` : ''} x${item.quantity}
+
+          </span>
+
+          <span class="font-semibold text-gray-800">${formatCurrency(item.price * item.quantity)}</span>
+
+        </div>
+
+      `).join('');
+
+      if (order.notes) {
+
+        document.getElementById('resultNotesSection').classList.remove('hidden');
+
+        document.getElementById('resultNotes').textContent = order.notes;
+
+      } else {
+
+        document.getElementById('resultNotesSection').classList.add('hidden');
+
+      }
+
       document.getElementById('resultTotal').textContent = formatCurrency(order.total || 0);
 
-      // Timeline status
       const statusSteps = [
+
         { status: 'pending',    label: 'Pesanan Diterima', icon: '1' },
+
         { status: 'processing', label: 'Sedang Diproses',  icon: '2' },
+
         { status: 'ready',      label: 'Siap Diambil',     icon: '3' },
+
         { status: 'completed',  label: 'Selesai',          icon: '4' }
+
       ];
 
       const currentStatusIndex = statusSteps.findIndex(s => s.status === order.status);
+
       const timelineHTML = statusSteps.map((step, i) => {
+
         const isActive  = currentStatusIndex === -1 ? i === 0 : i <= currentStatusIndex;
+
         const isCurrent = currentStatusIndex === -1 ? i === 0 : i === currentStatusIndex;
 
         return `
+
           <div class="relative flex items-start gap-4">
+
             <div class="relative z-10 flex items-center justify-center w-8 h-8 rounded-full ${
+
               isActive ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-600'
+
             } ${isCurrent ? 'ring-4 ring-blue-200' : ''}">
+
               <span class="text-sm font-bold">${step.icon}</span>
+
             </div>
+
             <div class="flex-1 ${isActive ? '' : 'opacity-50'}">
+
               <p class="font-semibold text-gray-800">${step.label}</p>
+
               ${isCurrent ? '<p class="text-sm text-blue-600 font-medium">Status saat ini</p>' : ''}
+
             </div>
+
           </div>
+
         `;
+
       }).join('');
 
       document.getElementById('statusTimeline').innerHTML = timelineHTML;
 
     } catch (err) {
+
       console.error("Gagal mengambil pesanan:", err);
+
       alert("Terjadi kesalahan saat mengambil pesanan. Coba lagi.");
+
     }
+
   };
 
-  // ======================================================
-  //  FINISH ORDER (dipanggil setelah pesanan sukses)
-  // ======================================================
   window.finishOrder = function finishOrder() {
+
     cart = [];
+
     selectedVariants = {};
+
     updateCart();
+
     closeCheckoutModal();
+
     showLandingPage();
 
     const form = document.getElementById('checkoutForm');
+
     if (form) form.reset();
+
   };
+
 </script>
