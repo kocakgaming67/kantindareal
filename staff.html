@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="id">
 <head>
@@ -5,53 +6,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard Staff Kantin</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
-    body { box-sizing: border-box; }
-
-    .status-pill {
-      border-radius: 9999px;
-      padding: 4px 10px;
-      font-size: 12px;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    /* === ANIMASI BULAT2 SAMA SEPERTI index.html === */
-    @keyframes floatRotate1 {
-      0%   { transform: translate(0,0) rotate(0deg) scale(1); }
-      33%  { transform: translate(30px,-20px) rotate(120deg) scale(1.1); }
-      66%  { transform: translate(-20px,30px) rotate(240deg) scale(0.9); }
-      100% { transform: translate(0,0) rotate(360deg) scale(1); }
-    }
-    @keyframes floatRotate2 {
-      0%   { transform: translate(0,0) rotate(0deg) scale(1); }
-      33%  { transform: translate(-40px,25px) rotate(-120deg) scale(0.9); }
-      66%  { transform: translate(25px,-30px) rotate(-240deg) scale(1.15); }
-      100% { transform: translate(0,0) rotate(-360deg) scale(1); }
-    }
-
-    .animated-circle-1 {
-      animation: floatRotate1 5s ease-in-out infinite;
-    }
-    .animated-circle-2 {
-      animation: floatRotate2 6s ease-in-out infinite;
-    }
-  </style>
+ <style>
+  body { box-sizing: border-box; }
+  .status-pill {
+    border-radius: 9999px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  @keyframes floatRotate1 {
+    0%   { transform: translate(0,0) rotate(0deg) scale(1); }
+    33%  { transform: translate(30px,-20px) rotate(120deg) scale(1.1); }
+    66%  { transform: translate(-20px,30px) rotate(240deg) scale(0.9); }
+    100% { transform: translate(0,0) rotate(360deg) scale(1); }
+  }
+  @keyframes floatRotate2 {
+    0%   { transform: translate(0,0) rotate(0deg) scale(1); }
+    33%  { transform: translate(-40px,25px) rotate(-120deg) scale(0.9); }
+    66%  { transform: translate(25px,-30px) rotate(-240deg) scale(1.15); }
+    100% { transform: translate(0,0) rotate(-360deg) scale(1); }
+  }
+  .animated-circle-1 {
+    animation: floatRotate1 5s ease-in-out infinite;
+  }
+  .animated-circle-2 {
+    animation: floatRotate2 6s ease-in-out infinite;
+  }
+</style>
 </head>
-
 <body class="bg-gradient-to-br from-slate-50 to-slate-200 min-h-screen">
-  <!-- HEADER -->
   <header class="relative overflow-hidden bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-4 px-6 shadow-lg">
-    <!-- bulat-bulat animasi -->
     <div class="pointer-events-none absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 animated-circle-1"></div>
     <div class="pointer-events-none absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full -ml-16 -mb-16 animated-circle-2"></div>
-
-    <!-- konten header -->
     <div class="relative max-w-6xl mx-auto flex justify-between items-center">
-      <!-- Kiri: logo + judul -->
       <div class="flex items-center gap-3">
         <img src="logo.png"
              alt="Logo Kantin"
@@ -62,11 +52,8 @@
           <p class="text-xs md:text-sm text-white/80">Kelola pesanan & menu kantin</p>
         </div>
       </div>
-
-      <!-- Kanan: tab + status -->
       <div class="flex items-center gap-3">
-        <!-- NAV -->
-        <nav class="flex items-center gap-2">
+        <nav class="hidden md:flex items-center gap-2">
           <button
             data-section-btn="orders"
             class="px-4 py-2 rounded-full text-xs md:text-sm font-semibold bg-white text-orange-600 shadow-sm"
@@ -75,25 +62,44 @@
           </button>
           <button
             data-section-btn="menu"
-            class="px-4 py-2 rounded-full text-xs md:text-sm font-semibold bg-white/20 text-white hover:bg-white/30 transition"
+            class="px-4 py-2 rounded-full text-xs md:text-sm font-semibold bg-orange-400/40 hover:bg-orange-400/60 transition"
             onclick="showSection('menu')">
             Daftar Menu
           </button>
         </nav>
-
-        <!-- Badge koneksi -->
         <span id="connectionStatus"
-              class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/20 text-xs">
+              class="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/20 text-xs">
           Menyambung...
         </span>
+        <div class="md:hidden relative">
+          <button id="hamburgerBtn" class="p-2 rounded-md bg-white/20 hover:bg-white/30">
+            ☰
+          </button>
+          <div id="mobileMenu"
+               class="hidden absolute right-0 mt-2 w-44 bg-white text-gray-800 rounded-xl shadow-lg overflow-hidden z-50">
+            <button
+              data-section-btn="orders"
+              class="block w-full text-left px-4 py-2 text-sm hover:bg-orange-50"
+              onclick="showSection('orders'); toggleMobileMenu(false);">
+              Orderan
+            </button>
+            <button
+              data-section-btn="menu"
+              class="block w-full text-left px-4 py-2 text-sm hover:bg-orange-50"
+              onclick="showSection('menu'); toggleMobileMenu(false);">
+              Daftar Menu
+            </button>
+            <div class="border-t text-xs px-4 py-2 text-gray-500 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-green-400"></span>
+              <span id="connectionStatusMobile">Online</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </header>
-
   <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
-    <!-- ============= SECTION: ORDERAN ============= -->
     <section id="ordersSection" class="space-y-6">
-      <!-- Filter Status -->
       <div class="bg-white rounded-2xl shadow p-4 flex flex-wrap gap-3 items-center">
         <span class="font-semibold text-gray-700 mr-2">Status:</span>
         <div class="flex flex-wrap gap-2">
@@ -129,8 +135,6 @@
           </button>
         </div>
       </div>
-
-      <!-- Ringkasan jumlah -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-white rounded-2xl shadow p-4">
           <p class="text-sm text-gray-500">Total Order</p>
@@ -149,17 +153,11 @@
           <p id="sumReady" class="text-2xl font-bold text-green-500">0</p>
         </div>
       </div>
-
-      <!-- Daftar Order -->
       <div id="ordersContainer" class="space-y-4"></div>
-
-      <!-- Empty state -->
       <div id="emptyState" class="hidden mt-10 text-center text-gray-500">
         Belum ada order.
       </div>
     </section>
-
-    <!-- ============= SECTION: DAFTAR MENU ============= -->
     <section id="menuSection" class="hidden space-y-4">
       <section class="bg-white rounded-2xl shadow p-6">
         <h2 class="text-lg font-semibold text-gray-800 mb-1">Kelola Ketersediaan Menu</h2>
@@ -168,54 +166,21 @@
         </p>
         <form id="menuStatusForm" class="mt-4 space-y-4">
           <div id="menuStatusList" class="divide-y divide-gray-100">
-            <!-- daftar menu + checkbox diisi lewat JS -->
           </div>
         </form>
       </section>
     </section>
   </main>
-
-  <!-- ========== MODAL KONFIRMASI GANTI STATUS ========== -->
-  <div
-    id="confirmModal"
-    class="hidden fixed inset-0 bg-black/40 z-50 items-center justify-center px-4"
-  >
-    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6">
-      <h2 class="text-lg font-bold text-gray-800 mb-2">Konfirmasi</h2>
-      <p id="confirmMessage" class="text-sm text-gray-600 mb-5">
-        Yakin ingin mengubah status pesanan ini?
-      </p>
-      <div class="flex flex-col sm:flex-row justify-end gap-3">
-        <button
-          id="confirmCancelBtn"
-          type="button"
-          class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-300"
-        >
-          Batal
-        </button>
-        <button
-          id="confirmOkBtn"
-          type="button"
-          class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-yellow-500 text-white text-sm font-semibold hover:from-orange-600 hover:to-yellow-600 shadow"
-        >
-          Ubah Status
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= FIREBASE & LOGIC STAFF ================= -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
     import {
       getDatabase,
       ref,
       onValue,
+      get,
       update,
       set
     } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
-
-    // CONFIG SAMA DENGAN index.html
     const firebaseConfig = {
       apiKey: "AIzaSyCkejTcOfPpedhrOx4gI4HVrejIM3G7cRg",
       authDomain: "kantin-sekolah-e6aea.firebaseapp.com",
@@ -225,13 +190,9 @@
       appId: "1:296536339754:web:05fac7daec8b65dd211a53",
       databaseURL: "https://kantin-sekolah-e6aea-default-rtdb.asia-southeast1.firebasedatabase.app"
     };
-
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
-
     console.log("✅ Terhubung ke Firebase kantin-sekolah-e6aea");
-
-    // ================== DATA MASTER MENU (UNTUK PANEL STAFF) ==================
     const menuMaster = [
       { id: 1,  name: "Bakwan" },
       { id: 2,  name: "Dayaki" },
@@ -245,21 +206,18 @@
       { id: 10, name: "Malkis" },
       { id: 11, name: "Gery Salut" },
       { id: 12, name: "Tic Tac" },
-
       {
         id: 13,
         name: "Roti Beta",
         hasVariants: true,
         variants: ["Original", "Moka", "Cream", "Kompiang", "Kacang Hijau"]
       },
-
       {
         id: 14,
         name: "Kacang Garuda",
         hasVariants: true,
         variants: ["Original", "Atom"]
       },
-
       {
         id: 15,
         name: "Permen",
@@ -273,10 +231,8 @@
           "Permen Mentos"
         ]
       },
-
       { id: 16, name: "Donat" },
       { id: 17, name: "Pukis" },
-
       { id: 18, name: "Golda Coffee" },
       { id: 19, name: "Floridina" },
       { id: 20, name: "Milku" },
@@ -286,27 +242,20 @@
       { id: 24, name: "Teh Rio" },
       { id: 25, name: "Air Putih" }
     ];
-
-    // ============ LISTENER menuStatus KHUSUS STAFF + RENDER PANEL ============
     const menuStatusRef = ref(db, "menuStatus");
     window.menuStatus = window.menuStatus || {};
-
     onValue(menuStatusRef, (snapshot) => {
       window.menuStatus = snapshot.val() || {};
       renderMenuStatusPanel();
     });
-
     function renderMenuStatusPanel() {
       const container = document.getElementById("menuStatusList");
       if (!container) return;
-
       const statusMap = window.menuStatus || {};
-
       container.innerHTML = menuMaster.map((item) => {
         const status = statusMap[item.id] || {};
         const disabled = status.disabled === true;
         const disabledVariants = status.disabledVariants || {};
-
         return `
       <div class="py-3 border-b border-gray-100 last:border-b-0">
         <div class="flex items-start justify-between gap-4">
@@ -330,7 +279,6 @@
             </label>
           </div>
         </div>
-
         ${
           item.hasVariants
             ? `
@@ -360,88 +308,22 @@
     `;
       }).join("");
     }
-
     const ordersRef        = ref(db, "orders");
     const container        = document.getElementById("ordersContainer");
     const emptyState       = document.getElementById("emptyState");
     const connectionStatus = document.getElementById("connectionStatus");
-
+    const connectionStatusMobile = document.getElementById("connectionStatusMobile");
     const sumTotalEl      = document.getElementById("sumTotal");
     const sumPendingEl    = document.getElementById("sumPending");
     const sumProcessingEl = document.getElementById("sumProcessing");
     const sumReadyEl      = document.getElementById("sumReady");
-
-    // ===== Konfirmasi modal elements =====
-    const confirmModal      = document.getElementById("confirmModal");
-    const confirmMessageEl  = document.getElementById("confirmMessage");
-    const confirmCancelBtn  = document.getElementById("confirmCancelBtn");
-    const confirmOkBtn      = document.getElementById("confirmOkBtn");
-
-    let pendingOrderId   = null;
-    let pendingNewStatus = null;
-
-    function openConfirmModal(message, orderId, newStatus) {
-      pendingOrderId   = orderId;
-      pendingNewStatus = newStatus;
-      if (confirmMessageEl) confirmMessageEl.textContent = message;
-
-      if (confirmModal) {
-        confirmModal.classList.remove("hidden");
-        confirmModal.classList.add("flex");
-      }
-    }
-
-    function closeConfirmModal() {
-      pendingOrderId   = null;
-      pendingNewStatus = null;
-      if (confirmModal) {
-        confirmModal.classList.add("hidden");
-        confirmModal.classList.remove("flex");
-      }
-    }
-
-    if (confirmCancelBtn) {
-      confirmCancelBtn.addEventListener("click", () => {
-        closeConfirmModal();
-      });
-    }
-
-    if (confirmOkBtn) {
-      confirmOkBtn.addEventListener("click", async () => {
-        if (!pendingOrderId || !pendingNewStatus) {
-          closeConfirmModal();
-          return;
-        }
-
-        const orderRef = ref(db, "orders/" + pendingOrderId);
-        try {
-          await update(orderRef, { status: pendingNewStatus });
-        } catch (err) {
-          console.error(err);
-          alert("Gagal mengubah status, coba lagi.");
-        }
-        closeConfirmModal();
-      });
-    }
-
-    if (confirmModal) {
-      confirmModal.addEventListener("click", (e) => {
-        if (e.target === confirmModal) {
-          closeConfirmModal();
-        }
-      });
-    }
-
-    // filter status yang sedang aktif di UI
     let currentFilter   = "all";
     let latestEntries   = [];
-
     document.querySelectorAll(".status-filter").forEach(btn => {
       if (btn.dataset.status === currentFilter) {
         btn.classList.add("ring-2", "ring-offset-1", "ring-orange-400");
       }
     });
-
     const STATUS_LABEL = {
       pending:    "Pending",
       processing: "Diproses",
@@ -449,7 +331,6 @@
       completed:  "Selesai",
       cancelled:  "Dibatalkan"
     };
-
     const STATUS_CLASS = {
       pending:    "bg-yellow-100 text-yellow-800",
       processing: "bg-blue-100 text-blue-800",
@@ -457,71 +338,58 @@
       completed:  "bg-green-100 text-green-800",
       cancelled:  "bg-red-100 text-red-800"
     };
-
     function formatCurrency(amount) {
       return "Rp " + (amount || 0).toLocaleString("id-ID");
     }
-
-    // ============ LISTENER REALTIME ============
     onValue(ordersRef, (snapshot) => {
       const data = snapshot.val() || {};
-
       connectionStatus.textContent = "Online";
       connectionStatus.className =
-        "inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold";
-
+        "hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold";
+      if (connectionStatusMobile) {
+        connectionStatusMobile.textContent = "Online";
+      }
       const entries = Object.entries(data).map(([id, order]) => ({
         id,
         ...order
       }));
-
       entries.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
       latestEntries = entries;
-
       renderSummary(latestEntries);
       renderOrders(latestEntries);
     }, (error) => {
       console.error(error);
       connectionStatus.textContent = "Gagal terhubung";
       connectionStatus.className =
-        "inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold";
+        "hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold";
+      if (connectionStatusMobile) {
+        connectionStatusMobile.textContent = "Offline";
+      }
     });
-
-    // ============ RENDER SUMMARY ============
     function renderSummary(entries) {
       if (!sumTotalEl) return;
-
       sumTotalEl.textContent = entries.length;
-
       const counts = { pending: 0, processing: 0, ready: 0, completed: 0, cancelled: 0 };
       entries.forEach(o => {
         if (counts[o.status] !== undefined) counts[o.status]++;
       });
-
       if (sumPendingEl)    sumPendingEl.textContent    = counts.pending;
       if (sumProcessingEl) sumProcessingEl.textContent = counts.processing;
       if (sumReadyEl)      sumReadyEl.textContent      = counts.ready;
     }
-
-    // ============ RENDER ORDERS ============
     function renderOrders(entries) {
       const filtered = currentFilter === "all"
         ? entries
         : entries.filter(o => o.status === currentFilter);
-
       if (filtered.length === 0) {
         container.innerHTML = "";
         emptyState.classList.remove("hidden");
         return;
       }
-
       emptyState.classList.add("hidden");
-
       container.innerHTML = filtered.map(order => {
         const created = order.createdAt ? new Date(order.createdAt) : new Date();
         const timeStr = created.toLocaleString("id-ID");
-
         const itemsHtml = (order.items || []).map(it => `
           <div class="flex justify-between text-sm">
             <span class="text-gray-700">
@@ -532,10 +400,8 @@
             </span>
           </div>
         `).join("");
-
         const statusLabel = STATUS_LABEL[order.status] || order.status || "-";
         const statusClass = STATUS_CLASS[order.status] || "bg-gray-100 text-gray-700";
-
         const actionsHtml = `
           <div class="flex flex-wrap gap-2 mt-3">
             ${order.status !== "pending" ? "" : `
@@ -560,7 +426,6 @@
               </button>`}
           </div>
         `;
-
         return `
           <div class="bg-white rounded-2xl shadow-md p-4 md:p-5">
             <div class="flex justify-between items-start gap-3 mb-3">
@@ -572,7 +437,6 @@
                 ● ${statusLabel}
               </span>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
               <div>
                 <p class="text-xs text-gray-500">Nama</p>
@@ -591,14 +455,12 @@
                 <p class="font-bold text-lg text-orange-600">${formatCurrency(order.total)}</p>
               </div>
             </div>
-
             <div class="mb-3">
               <p class="text-xs text-gray-500 mb-1">Item Pesanan</p>
               <div class="bg-slate-50 rounded-xl p-3 space-y-1">
                 ${itemsHtml || '<p class="text-sm text-gray-500">Tidak ada item.</p>'}
               </div>
             </div>
-
             ${order.notes ? `
               <div class="mb-2">
                 <p class="text-xs text-gray-500 mb-1">Catatan</p>
@@ -607,22 +469,17 @@
                 </div>
               </div>
             ` : ""}
-
             ${actionsHtml}
           </div>
         `;
       }).join("");
     }
-
-    // ============ GANTI STATUS (pakai modal, bukan confirm bawaan) ============
     container.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-action='set-status']");
       if (!btn) return;
-
       const id     = btn.dataset.id;
       const status = btn.dataset.status;
       if (!id || !status) return;
-
       const confTexts = {
         processing: "Tandai pesanan ini sedang diproses?",
         ready:      "Tandai pesanan ini siap diambil?",
@@ -630,52 +487,43 @@
         cancelled:  "Batalkan pesanan ini?"
       };
       const msg = confTexts[status] || "Ubah status pesanan?";
-
-      openConfirmModal(msg, id, status);
+      if (!confirm(msg)) return;
+      const orderRef = ref(db, "orders/" + id);
+      update(orderRef, { status }).catch(err => {
+        console.error(err);
+        alert("Gagal mengubah status, coba lagi.");
+      });
     });
-
-    // ============ FILTER STATUS BUTTONS ============
     document.querySelectorAll(".status-filter").forEach(btn => {
       btn.addEventListener("click", () => {
         currentFilter = btn.dataset.status;
-
         document.querySelectorAll(".status-filter").forEach(b => {
           b.classList.remove("ring-2", "ring-offset-1", "ring-orange-400");
         });
         btn.classList.add("ring-2", "ring-offset-1", "ring-orange-400");
-
         renderOrders(latestEntries);
       });
     });
-
-    // ============ HANDLER CHECKBOX MENU / VARIAN (NYIMPEN KE DB) ============
     const menuStatusListEl = document.getElementById("menuStatusList");
-
     if (menuStatusListEl) {
       menuStatusListEl.addEventListener("change", async (event) => {
         const target = event.target;
-
-        // toggle satu menu (on/off semua varian)
         if (target.matches("[data-menu-toggle]")) {
-          const menuId   = Number(target.getAttribute("data-menu-toggle"));
+          const menuId = Number(target.getAttribute("data-menu-toggle"));
           const disabled = target.checked;
           await updateWholeMenuStatus(menuId, { disabled });
         }
-
-        // toggle varian tertentu
         if (target.matches("[data-variant-toggle]")) {
-          const menuId      = Number(target.getAttribute("data-variant-toggle"));
+          const menuId = Number(target.getAttribute("data-variant-toggle"));
           const variantName = target.getAttribute("data-variant-name");
-          const disabled    = target.checked;
+          const disabled = target.checked;
           await updateVariantStatus(menuId, variantName, disabled);
         }
       });
     }
-
     async function updateWholeMenuStatus(menuId, partial) {
-      const current   = (window.menuStatus && window.menuStatus[menuId]) || {};
+      const current = (window.menuStatus && window.menuStatus[menuId]) || {};
       const newStatus = { ...current, ...partial };
-
       const menuRef = ref(db, `menuStatus/${menuId}`);
       try {
         await set(menuRef, newStatus);
@@ -684,20 +532,16 @@
         alert("Gagal menyimpan status menu. Coba lagi ya.");
       }
     }
-
     async function updateVariantStatus(menuId, variantName, disabled) {
-      const current          = (window.menuStatus && window.menuStatus[menuId]) || {};
+      const current = (window.menuStatus && window.menuStatus[menuId]) || {};
       const disabledVariants = { ...(current.disabledVariants || {}) };
-
       if (disabled) {
         disabledVariants[variantName] = true;
       } else {
         delete disabledVariants[variantName];
       }
-
       const newStatus = { ...current, disabledVariants };
-      const menuRef   = ref(db, `menuStatus/${menuId}`);
-
+      const menuRef = ref(db, `menuStatus/${menuId}`);
       try {
         await set(menuRef, newStatus);
       } catch (err) {
@@ -705,13 +549,10 @@
         alert("Gagal menyimpan status varian. Coba lagi ya.");
       }
     }
-
-    // ========= SWITCH SECTION (ORDERS / MENU) =========
     window.showSection = function showSection(section) {
       const orders = document.getElementById("ordersSection");
       const menu   = document.getElementById("menuSection");
       if (!orders || !menu) return;
-
       if (section === "menu") {
         orders.classList.add("hidden");
         menu.classList.remove("hidden");
@@ -720,21 +561,51 @@
         orders.classList.remove("hidden");
         menu.classList.add("hidden");
       }
-
       document.querySelectorAll("[data-section-btn]").forEach(btn => {
         const target   = btn.getAttribute("data-section-btn");
         const isActive = target === section;
-
-        const baseClasses = "px-4 py-2 rounded-full text-xs md:text-sm font-semibold";
-        if (isActive) {
-          btn.className = baseClasses + " bg-white text-orange-600 shadow-sm";
+        if (btn.closest("#mobileMenu")) {
+          btn.classList.toggle("bg-orange-50", isActive);
+          btn.classList.toggle("font-semibold", isActive);
         } else {
-          btn.className = baseClasses + " bg-white/20 text-white hover:bg-white/30 transition";
+          const baseClasses = "px-4 py-2 rounded-full text-xs md:text-sm font-semibold";
+          if (isActive) {
+            btn.className = baseClasses + " bg-white text-orange-600 shadow-sm";
+          } else {
+            btn.className = baseClasses + " bg-orange-400/40 hover:bg-orange-400/60 transition text-white";
+          }
         }
       });
     };
-
-    // default: buka section orders
+    window.toggleMobileMenu = function toggleMobileMenu(force) {
+      const menu = document.getElementById("mobileMenu");
+      if (!menu) return;
+      const shouldShow =
+        typeof force === "boolean" ? force : menu.classList.contains("hidden");
+      if (shouldShow) {
+        menu.classList.remove("hidden");
+      } else {
+        menu.classList.add("hidden");
+      }
+    };
+    const hamburgerBtn = document.getElementById("hamburgerBtn");
+    if (hamburgerBtn) {
+      hamburgerBtn.addEventListener("click", () => {
+        toggleMobileMenu();
+      });
+    }
+    document.addEventListener("click", (event) => {
+      const menu = document.getElementById("mobileMenu");
+      const btn  = document.getElementById("hamburgerBtn");
+      if (!menu || !btn) return;
+      if (
+        !menu.classList.contains("hidden") &&
+        !menu.contains(event.target) &&
+        !btn.contains(event.target)
+      ) {
+        menu.classList.add("hidden");
+      }
+    });
     showSection("orders");
   </script>
 </body>
